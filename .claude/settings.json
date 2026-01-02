@@ -1,0 +1,55 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "WebSearch"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Evaluate whether Claude should stop working. Context: $ARGUMENTS\n\nAs the orchestrating evaluator, check:\n1. Has the assigned task been fully completed?\n2. Are there any errors or failing tests that need to be addressed?\n3. Has the work been properly documented in GitHub issues/PRs as required?\n4. Have all relevant personas/agents been consulted for their domain expertise?\n5. Is there follow-up work that should be tracked?\n\nRespond with JSON:\n- decision: 'approve' (allow stop) or 'block' (continue working)\n- reason: explanation for your decision\n- systemMessage: any warnings or notes for the user",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Evaluate if this subagent has completed its assigned task. Input: $ARGUMENTS\n\nCheck:\n- Did the subagent fulfill its specific role (product-owner, architect, developer, tester, secops, ui-ux)?\n- Is the work ready for handoff to the next persona in the workflow?\n- Are there blocking issues that need escalation?\n\nRespond with JSON:\n- decision: 'approve' or 'block'\n- reason: explanation",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Automatasaurus workflow initialized. GitHub integration ready.'"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "WORKFLOW_MODE": "automated",
+    "GITHUB_WORKFLOW": "enabled"
+  }
+}
