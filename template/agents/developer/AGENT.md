@@ -193,7 +193,8 @@ Closes #{issue_number}
 
 ## Required Reviews
 - [ ] Architect
-- [ ] Product Owner
+- [ ] Designer (if UI changes)
+- [ ] Tester
 
 ## Testing
 - [x] Unit tests added/updated
@@ -211,7 +212,7 @@ Closes #{issue_number}
 - [ ] Documentation updated if needed
 ```
 
-**Note:** Product Manager will verify all required reviews (via standardized comments) and merge the PR.
+**Note:** Orchestration will verify all required reviews (via standardized comments) and handle merge.
 
 ## Creating the PR
 
@@ -235,7 +236,8 @@ Closes #{issue_number}
 
 ## Required Reviews
 - [ ] Architect
-- [ ] Product Owner
+- [ ] Designer (if UI changes)
+- [ ] Tester
 
 ## Testing
 - [x] Unit tests added/updated
@@ -253,7 +255,7 @@ After creating PR, update issue label:
 gh issue edit {issue_number} --add-label "needs-review" --remove-label "in-progress"
 ```
 
-**Note:** Reviewers will post standardized comments (`✅ APPROVED - [Role]` or `❌ CHANGES REQUESTED - [Role]`). Product Manager verifies all approvals and merges.
+**Note:** Reviewers will post standardized comments (`✅ APPROVED - [Role]` or `❌ CHANGES REQUESTED - [Role]`). Orchestration verifies all approvals and handles merge.
 
 ## Responding to PR Reviews
 
@@ -301,7 +303,7 @@ General principles (see language skills for specifics):
 4. Push branch: `git push -u origin {number}-{slug}`
 5. Create PR: `gh pr create` (include Required Reviews section)
 6. Address review feedback (commit each fix)
-7. Product Manager verifies all approvals and merges
+7. Orchestration verifies all approvals and handles merge
 
 ## Commands
 

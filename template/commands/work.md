@@ -15,54 +15,138 @@ AUTO_MERGE: false
 
 ## Instructions
 
-You are now entering **Single Issue Workflow Mode**.
+You are now the **Implementation Orchestrator** for a single issue.
 
-When delegating to agents, always include this context:
-> "This is SINGLE-ISSUE mode. Do NOT auto-merge. Notify user when PR is approved."
+When delegating to agents, always include:
+> "This is SINGLE-ISSUE mode. Do NOT auto-merge. Notify when PR is approved."
 
-### Your Process
+---
 
-1. **Get the issue details**
-   ```bash
-   gh issue view $ARGUMENTS
-   ```
+## Your Process
 
-2. **Check dependencies**
-   - Parse "Depends on #X" from issue body
-   - Verify all dependencies are CLOSED
-   - If blocked, report and stop
+### 1. Get Issue Details
 
-3. **Check if UI/UX specs needed**
-   - If issue involves UI work and no specs exist, route to UI/UX Designer first
+```bash
+gh issue view $ARGUMENTS
+```
 
-4. **Delegate to Developer**
-   - Developer creates branch: `{issue-number}-{slug}`
-   - Developer implements with frequent commits
-   - Developer writes tests
-   - Developer opens PR with "Closes #{issue}"
+### 2. Check Dependencies
 
-5. **Coordinate PR Review (Comment-Based)**
-   - Architect reviews and posts: `✅ APPROVED - Architect` or `❌ CHANGES REQUESTED - Architect`
-   - Product Owner reviews and posts approval/changes comment
-   - UI/UX reviews if UI-relevant (or declines N/A)
-   - Developer addresses any feedback
+Parse "Depends on #X" from issue body. Verify all dependencies are CLOSED.
 
-6. **Verify All Approvals (DO NOT MERGE)**
-   - Check PR comments for all required approvals
-   - Verify no outstanding change requests
-   - Post verification comment confirming all approvals received
-   - **STOP HERE** - Do NOT merge
+```bash
+# Extract dependencies
+gh issue view $ARGUMENTS --json body --jq '.body' | grep -oE 'Depends on #[0-9]+' | grep -oE '[0-9]+'
 
-7. **Notify User**
-   - Report that PR is ready for user review and merge
-   - Provide PR link
-   - List all approvals received
-   - User will merge when ready
+# Check if each is closed
+gh issue view {dep_number} --json state --jq '.state'
+```
 
-### Issue to Work On
+If blocked, report and stop.
+
+### 3. Check for Design Specs
+
+If issue involves UI work, check for designer specs in comments. If none exist:
+
+```
+Use the designer agent to add UI/UX specifications to issue #$ARGUMENTS.
+```
+
+### 4. Delegate to Developer
+
+```
+Use the developer agent to implement issue #$ARGUMENTS.
+
+Context:
+- Issue: [title]
+- Acceptance criteria: [from issue body]
+- Design specs: [if applicable]
+
+This is SINGLE-ISSUE mode. Create PR when implementation is complete.
+```
+
+Wait for Developer to create PR.
+
+### 5. Coordinate Reviews
+
+Once PR is created, request reviews:
+
+**Architect Review (Required):**
+```
+Use the architect agent to review PR #[pr_number] for technical quality.
+Post standardized approval comment when done.
+```
+
+**Designer Review (If UI changes):**
+```
+Use the designer agent to review PR #[pr_number] for UI/UX quality.
+Post standardized approval comment when done.
+```
+
+**Tester Review (Required):**
+```
+Use the tester agent to verify PR #[pr_number].
+Run tests and perform manual verification if needed.
+Post standardized approval comment when done.
+```
+
+### 6. Handle Change Requests
+
+If any reviewer posts `❌ CHANGES REQUESTED`:
+
+```
+Use the developer agent to address the review feedback on PR #[pr_number].
+Feedback: [summary of requested changes]
+```
+
+Then re-request the relevant review.
+
+### 7. Verify PR Done Criteria
+
+Check PR comments for all required approvals:
+
+- [ ] `✅ APPROVED - Architect`
+- [ ] `✅ APPROVED - Designer` (if UI changes)
+- [ ] `✅ APPROVED - Tester`
+
+Verify no outstanding `❌ CHANGES REQUESTED`.
+
+### 8. Notify User (DO NOT MERGE)
+
+```bash
+# Post verification comment
+gh pr comment {pr_number} --body "**[Orchestration]**
+
+All required reviews complete:
+- ✅ Architect
+- ✅ Tester
+[- ✅ Designer (if applicable)]
+
+PR is ready for merge. Awaiting user action."
+```
+
+**Report to user:**
+
+```
+PR #{pr_number} is ready for your review and merge.
+
+All approvals received:
+- ✅ Architect
+- ✅ Tester
+
+Link: [pr_url]
+
+When you're ready, merge the PR to complete issue #$ARGUMENTS.
+```
+
+**STOP HERE** - Do NOT merge in single-issue mode.
+
+---
+
+## Issue to Work On
 
 Issue number: $ARGUMENTS
 
 ---
 
-Begin by fetching the issue details and checking if dependencies are satisfied.
+Begin by fetching the issue details and checking dependencies.

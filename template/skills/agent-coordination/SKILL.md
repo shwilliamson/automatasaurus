@@ -1,91 +1,166 @@
 ---
 name: agent-coordination
-description: Coordinates work between multiple persona agents in the Automatasaurus workflow. Use when orchestrating multi-agent tasks or handoffs between personas.
+description: Patterns for invoking and coordinating Automatasaurus agents. Use when delegating tasks to specialist agents.
 ---
 
 # Agent Coordination Skill
 
-This skill provides guidance for coordinating work across the Automatasaurus persona agents.
+This skill provides patterns for invoking the Automatasaurus agents.
 
-## Workflow Patterns
+## Available Agents
 
-### New Feature Development
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| `developer` | Implements issues, creates PRs | When code needs to be written |
+| `architect` | Technical reviews, analysis | For PR reviews, discovery reviews, stuck issues |
+| `designer` | UI/UX reviews, design specs | For PR reviews, discovery reviews, design specs |
+| `tester` | Testing, verification | For PR verification, running tests |
 
-```
-1. Product Owner → Define requirements, create issue
-2. Architect → Design solution, create ADR if needed
-3. UI/UX → Design user experience (if applicable)
-4. Developer → Implement solution
-5. Tester → Write and run tests
-6. Architect → Code review
-7. Product Owner → Accept/reject based on criteria
-```
+---
 
-### Bug Fix
+## Invocation Patterns
 
-```
-1. Tester/Product Owner → Document bug in issue
-2. Developer → Investigate and diagnose
-3. Architect → Consult on complex issues
-4. Developer → Implement fix
-5. Tester → Verify fix and regression test
-```
-
-### Security Issue
+### Developer - Implement an Issue
 
 ```
-1. Architect → Assess and document vulnerability
-2. Architect → Design remediation approach
-3. Developer → Implement fix
-4. Architect → Verify remediation
-5. Product Manager → Coordinate disclosure if needed
+Use the developer agent to implement issue #{number}.
+
+Context:
+- Issue: [title]
+- Acceptance criteria: [from issue body]
+- Design specs: [if applicable, from designer comments]
+
+This is [MODE] mode. Create PR when implementation is complete.
 ```
 
-## Agent Invocation Examples
+### Architect - Review Discovery Plan
 
-### Sequential Handoff
 ```
-Use the product-owner agent to create a user story for [feature]
-Use the architect agent to design the technical approach
-Use the developer agent to implement the solution
-Use the tester agent to create test coverage
-```
+Use the architect agent to review this discovery plan for technical feasibility.
 
-### Parallel Consultation
-```
-Use the architect and ui-ux agents to review this design
-Use the tester and developer agents to work on test coverage
+Focus on:
+- Architecture fit
+- Scalability
+- Security implications
+- Technology choices
+
+The discovery plan is at: [path to discovery.md]
 ```
 
-### Focused Review
+### Architect - Review PR
+
 ```
-Use the architect agent to review the architecture of PR #123
-Use the ui-ux agent to review the accessibility of this component
+Use the architect agent to review PR #{pr_number} for technical quality.
+
+Post a standardized approval comment when done:
+- ✅ APPROVED - Architect
+- OR ❌ CHANGES REQUESTED - Architect
 ```
 
-## Handoff Documentation
+### Architect - Analyze Stuck Issue
 
-When handing off between agents, include:
-1. What was completed
-2. Relevant issue/PR numbers
-3. Any decisions made
-4. Open questions or blockers
+```
+Use the architect agent to analyze issue #{number}.
+
+Developer has tried:
+1. [attempt 1]
+2. [attempt 2]
+...
+
+Error: [description]
+```
+
+### Designer - Review Discovery Plan
+
+```
+Use the designer agent to review this discovery plan for UI/UX considerations.
+
+Focus on:
+- User flows
+- Accessibility
+- Responsive design
+- Missing UI requirements
+
+The discovery plan is at: [path to discovery.md]
+```
+
+### Designer - Add Specs to Issue
+
+```
+Use the designer agent to add UI/UX specifications to issue #{number}.
+
+Review the issue requirements and add design specs as a comment.
+```
+
+### Designer - Review PR
+
+```
+Use the designer agent to review PR #{pr_number} for UI/UX quality.
+
+If no UI changes, post: "**[Designer]** N/A - No UI changes in this PR."
+
+Otherwise post standardized approval:
+- ✅ APPROVED - Designer
+- OR ❌ CHANGES REQUESTED - Designer
+```
+
+### Tester - Verify PR
+
+```
+Use the tester agent to verify PR #{pr_number}.
+
+Run tests and perform manual verification if needed.
+Post a standardized approval comment when done:
+- ✅ APPROVED - Tester
+- OR ❌ CHANGES REQUESTED - Tester
+```
+
+---
+
+## Parallel Invocation
+
+When reviews are independent, invoke agents in parallel:
+
+```
+# Invoke these in parallel (single message, multiple tool calls)
+Use the architect agent to review PR #123
+Use the designer agent to review PR #123
+Use the tester agent to verify PR #123
+```
+
+---
+
+## Handoff Information
+
+When delegating, include:
+
+1. **Issue/PR number** - What to work on
+2. **Context** - Acceptance criteria, design specs
+3. **Mode** - single-issue or all-issues (affects merge behavior)
+4. **Expected output** - What to produce (PR, comment, etc.)
+
+---
 
 ## Quality Gates
 
-Each persona has quality gates that must pass:
+Each agent has quality gates:
 
 | Agent | Gate |
 |-------|------|
-| Product Owner | Clear acceptance criteria defined |
-| Architect | ADR created for significant decisions |
 | Developer | Tests passing, PR created |
-| Tester | Test plan executed, coverage met |
-| UI/UX | Accessibility audit passed |
+| Architect | Technical review complete |
+| Designer | Design review complete |
+| Tester | All tests pass, verification complete |
 
-## Escalation
+---
 
-If an agent is blocked:
-1. Document the blocker in the issue
-2. Tag the appropriate persona for help
-3. Use the stop hook to prevent premature completion
+## Escalation Flow
+
+```
+Developer stuck (5 attempts)
+    ↓
+Architect analyzes
+    ↓
+If still stuck → Human escalation
+    .claude/hooks/request-attention.sh stuck "..."
+```
