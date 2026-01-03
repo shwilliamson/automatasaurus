@@ -113,7 +113,7 @@ Automatasaurus initialized successfully!
 Next steps:
   1. Review CLAUDE.md for framework documentation
   2. Update .claude/commands.md with your project-specific commands
-  3. Start using /plan, /work, or /work-all commands
+  3. Start using /discovery, /work, or /work-all commands
 
 Run "automatasaurus status" to see installation details.
 `);

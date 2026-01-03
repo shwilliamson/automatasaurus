@@ -12,21 +12,28 @@ Automatasaurus creates a team of AI personas that work together through GitHub i
 
 The workflow operates in two phases:
 
-### Phase 1: Planning (Interactive)
+### Phase 1: Discovery (Interactive)
 
 ```
 User describes feature/project
     ↓
-Product Owner: Gathers requirements, creates user stories
+Product Manager: Leads discovery conversation
+  - Goals and success metrics
+  - Users and stakeholders
+  - Business logic and constraints
+  - Infrastructure requirements
     ↓
-Architect: Makes technology decisions, documents in ADRs
+PM brings in specialists as needed:
+  - Architect: Technical feasibility, patterns
+  - Product Owner: User stories, acceptance criteria
+  - UI/UX: Design requirements
     ↓
 Product Owner: Creates GitHub issues with:
-  - User story and acceptance criteria
+  - User stories and acceptance criteria
   - Dependencies ("Depends on #X")
-  - Priority labels
+  - Organized into milestones
     ↓
-User approves issue breakdown
+User approves milestone/issue breakdown
     ↓
 User: "Start working on the issues"
 ```
@@ -54,7 +61,6 @@ User: "Start working on the issues"
 │                                                                     │
 │ 4. Review Cycle                                                     │
 │    ├→ Architect: REQUIRED review                                   │
-│    ├→ SecOps: Review if security-relevant (can decline "N/A")     │
 │    ├→ UI/UX: Review if UI-relevant (can decline "N/A")            │
 │    └→ Developer: Address feedback, push fixes                      │
 │                                                                     │
@@ -74,11 +80,10 @@ User: "Start working on the issues"
 | Persona | Role | Responsibilities |
 |---------|------|------------------|
 | **Product Owner** | Requirements | User stories, acceptance criteria, issue creation, follow-ups |
-| **Product Manager** | Coordination | Drives the loop, selects issues, routes to specialists |
+| **Product Manager** | Coordination | Leads discovery, drives the loop, selects issues, routes to specialists |
 | **Architect** | Design | System design, ADRs, required PR reviews, stuck-issue analysis |
 | **Developer** | Implementation | Feature development, bug fixes, PRs, addresses feedback |
 | **Tester** | Quality | Test execution, Playwright verification, final merge |
-| **SecOps** | Security | Security reviews (optional, can decline for non-security PRs) |
 | **UI/UX Designer** | Experience | Design specs, accessibility (optional, can decline for backend PRs) |
 
 ## Agent Comment Format
@@ -89,7 +94,6 @@ All agents prefix their comments with their identity:
 **[PM]** Starting work on issue #5. Routing to Developer.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** LGTM. Clean separation of concerns.
-**[SecOps]** N/A - No security impact in this change.
 **[UI/UX]** N/A - No UI changes in this PR.
 **[Tester]** Verified and approved. Merging.
 **[Product Owner]** Created follow-up issue #12 for discovered scope.
@@ -135,7 +139,7 @@ automatasaurus/
 └── .claude/
     ├── settings.json                      # Claude Code settings with hooks
     ├── commands/                          # Slash commands
-    │   ├── plan.md                        # /plan - Requirements mode
+    │   ├── discovery.md                   # /discovery - Discovery mode
     │   ├── work-all.md                    # /work-all - Process all issues
     │   └── work.md                        # /work - Process single issue
     ├── commands.md                        # Project-specific commands
@@ -150,11 +154,11 @@ automatasaurus/
     │   ├── architect/                     # Design & required PR reviews
     │   ├── developer/                     # Implementation & PRs
     │   ├── tester/                        # QA, Playwright, merge authority
-    │   ├── secops/                        # Security reviews (optional)
     │   └── ui-ux/                         # Design specs (optional)
     └── skills/                            # Reusable skills
         ├── workflow-orchestration/        # Full workflow documentation
         ├── github-workflow/               # Issue/PR/label management
+        ├── github-issues/                 # Task breakdown, issue sizing, milestones
         ├── pr-writing/                    # PR description best practices
         ├── code-review/                   # Code review best practices
         ├── agent-coordination/            # Multi-agent patterns
@@ -198,20 +202,21 @@ The primary way to invoke workflows:
 
 | Command | Description |
 |---------|-------------|
-| `/plan [feature]` | Start requirements gathering and planning |
+| `/discovery [feature]` | Start discovery to understand requirements and create plan |
 | `/work-all` | Work through all open issues autonomously |
 | `/work [issue#]` | Work on a specific issue |
 
-### `/plan` - Requirements Mode
+### `/discovery` - Discovery Mode
 
 ```
-/plan user authentication system
+/discovery user authentication system
 ```
 
-The Product Owner will:
-- Ask clarifying questions (lots of them!)
-- Work with Architect on technical approach
-- Create GitHub issues with dependencies
+The Product Manager will:
+- Lead a discovery conversation about goals, constraints, and requirements
+- Bring in specialists (Architect, Product Owner, UI/UX) as topics arise
+- Work with Product Owner to create well-formed GitHub issues
+- Organize issues into milestones
 - Get your approval before any implementation
 
 ### `/work-all` - Autonomous Loop
@@ -243,7 +248,6 @@ You can also invoke agents directly:
 
 ```
 Use the architect agent to review the database schema
-Use the secops agent to audit our dependencies
 Use the tester agent to create a test plan for the API
 Use the tester agent with playwright to verify the checkout flow
 ```
@@ -413,4 +417,4 @@ Contributions welcome:
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).

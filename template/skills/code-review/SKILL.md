@@ -9,18 +9,43 @@ Guidelines for performing effective code reviews that catch issues, improve code
 
 ## Review Mindset
 
+### Bias Towards Shipping
+
+**The primary goal is to get working code merged, not to achieve perfection.**
+
+Before requesting changes, always ask yourself:
+> "Is this feedback worth an additional review cycle?"
+
+Most feedback should be:
+- Approved with suggestions for the author to consider
+- Comments for future reference, not blocking
+- Follow-up issues for later improvement
+
+**Reserve "Request Changes" for actual problems:**
+- Security vulnerabilities
+- Bugs that will cause runtime errors
+- Breaking changes to existing functionality
+- Missing critical requirements
+
+**Do NOT block for:**
+- Style preferences (unless egregiously inconsistent)
+- "I would have done it differently"
+- Minor optimizations that don't matter at current scale
+- Missing tests for edge cases that are unlikely
+- Refactoring opportunities (create a follow-up issue instead)
+
 ### Goals of Code Review
-1. **Catch bugs** before they reach production
-2. **Ensure quality** - maintainability, readability, performance
+1. **Catch real bugs** before they reach production
+2. **Prevent security issues** - the things that actually matter
 3. **Share knowledge** across the team
-4. **Maintain consistency** with codebase patterns
-5. **Improve** - help the author grow
+4. **Ship working software** - don't let perfect be the enemy of good
 
 ### The Right Attitude
 - You're reviewing the **code**, not the person
 - Assume good intent - the author tried their best
 - Be a collaborator, not a gatekeeper
 - Your job is to help ship good code, not to find fault
+- **Velocity matters** - every review cycle has a cost
 
 ## Review Process
 
@@ -213,24 +238,26 @@ Consider using async/await for consistency.
 
 Use prefixes to indicate importance:
 
-| Prefix | Meaning |
-|--------|---------|
-| **Blocker:** | Must fix before merge |
-| **Suggestion:** | Would improve the code |
-| **Nit:** | Minor style/preference issue |
-| **Question:** | Seeking to understand |
-| **Praise:** | Something done well |
+| Prefix | Meaning | Frequency |
+|--------|---------|-----------|
+| **Blocker:** | Must fix before merge - security/bugs only | Rare |
+| **Suggestion:** | Would improve the code, not blocking | Common |
+| **Nit:** | Minor style/preference, definitely not blocking | Occasional |
+| **Question:** | Seeking to understand | As needed |
+| **Praise:** | Something done well | Often! |
+
+**Important:** Most comments should be Suggestions or Nits, not Blockers. If you find yourself writing many Blockers, reconsider whether they truly block shipping.
 
 ```markdown
-**Blocker:** This SQL query is vulnerable to injection.
+**Blocker:** This SQL query is vulnerable to injection. (Security - must fix)
 
-**Suggestion:** Consider extracting this into a helper function for reuse.
+**Suggestion:** Consider extracting this into a helper function for reuse. (Not blocking - can be done later)
 
-**Nit:** Extra blank line here.
+**Nit:** Extra blank line here. (Definitely not blocking)
 
-**Question:** Why did you choose this approach over X?
+**Question:** Why did you choose this approach over X? (Curious, not blocking)
 
-**Praise:** Really clean error handling here!
+**Praise:** Really clean error handling here! (Always welcome)
 ```
 
 ### Ask Questions Instead of Demanding
@@ -278,45 +305,55 @@ Don't just point out problems:
 
 ## Review Response Templates
 
-### Approve
+**Default to Approve.** Most reviews should approve, possibly with suggestions.
+
+### Approve (Most Common)
 ```markdown
 **[Architect]** LGTM! Clean implementation, good test coverage.
 
-Minor nits (not blocking):
+Minor suggestions (not blocking):
 - Line 42: prefer const
 - Consider adding a comment explaining the retry logic
+
+Merging as-is is fine. Address these if you agree, or not - your call.
 ```
 
 ### Approve with Suggestions
 ```markdown
 **[Architect]** Approving - this is solid work.
 
-A few suggestions to consider (can be addressed in follow-up if you prefer):
+A few things to consider (can address now or in follow-up):
 1. The validation could be more specific about what's wrong
 2. Consider adding logging for debugging
 
-None of these are blocking.
+Not blocking merge. Ship it!
 ```
 
-### Request Changes
+### Request Changes (Rare - Use Sparingly)
+
+**Only use for genuine blockers: security issues, bugs, or missing critical functionality.**
+
 ```markdown
-**[Architect]** Good progress! A few things need addressing before merge:
+**[Architect]** Good progress! Found one issue that needs fixing before merge:
 
-**Must fix:**
-1. SQL injection vulnerability in the search query
-2. Missing null check that will cause runtime error
+**Blocker:**
+1. SQL injection vulnerability in the search query - this is a security risk
 
-**Should fix:**
-3. Test for the error case
-
-Happy to re-review once addressed.
+Everything else looks good. Happy to re-review once the security fix is in.
 ```
+
+**Ask yourself before requesting changes:**
+- Will this cause a production incident if shipped?
+- Is this a security vulnerability?
+- Does it break existing functionality?
+
+If the answer to all three is "no", consider approving with suggestions instead.
 
 ### Decline (N/A)
 ```markdown
-**[SecOps]** N/A - No security impact in this change.
+**[UI/UX]** N/A - No UI changes in this PR.
 
-Reviewed: No authentication, authorization, input validation, or data handling changes detected.
+Reviewed: Backend/infrastructure changes only, no user-facing impact.
 ```
 
 ## Review Etiquette

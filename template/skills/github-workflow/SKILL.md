@@ -70,6 +70,12 @@ gh issue list --state open --label "ready"
 gh issue list --state open --label "ready" --label "priority:high"
 ```
 
+## Agent Identification
+
+**IMPORTANT:** All GitHub interactions must include an agent identifier header. Since all agents share the same GitHub user, this is essential for tracking who did what.
+
+Format: `**[Agent Name]**` at the start of every issue body, PR description, and comment.
+
 ## Issue Creation
 
 ### Feature Issue (Full Format)
@@ -81,6 +87,8 @@ gh issue create \
   --label "ready" \
   --label "priority:medium" \
   --body "$(cat <<'EOF'
+**[Product Owner]**
+
 ## User Story
 As a [type of user],
 I want [goal/desire],
@@ -116,6 +124,8 @@ gh issue create \
   --label "bug" \
   --label "ready" \
   --body "$(cat <<'EOF'
+**[Product Owner]**
+
 ## Description
 [What is the bug]
 
@@ -147,6 +157,8 @@ gh issue create \
   --label "enhancement" \
   --label "blocked" \
   --body "$(cat <<'EOF'
+**[Product Owner]**
+
 ## Background
 Discovered during implementation of #{original_issue}.
 
@@ -173,6 +185,8 @@ EOF
 gh pr create \
   --title "{type}: {description}" \
   --body "$(cat <<'EOF'
+**[Developer]**
+
 ## Summary
 [Brief description of changes]
 
@@ -215,26 +229,6 @@ These changes are needed before merge."
 
 # Comment only
 gh pr comment {number} --body "**[Architect]** Consider extracting this into a separate service for better testability."
-```
-
-### SecOps (Optional - Can Decline)
-
-```bash
-# N/A - Not security relevant
-gh pr comment {number} --body "**[SecOps]** N/A - No security impact in this change.
-
-Reviewed: No authentication, authorization, input validation, or data handling changes detected."
-
-# Approval
-gh pr review {number} --approve --body "**[SecOps]** Security review passed. No vulnerabilities detected."
-
-# Request changes
-gh pr review {number} --request-changes --body "**[SecOps]** Security issues found:
-
-1. [Vulnerability and remediation]
-2. [Vulnerability and remediation]
-
-Please address before merge."
 ```
 
 ### UI/UX (Optional - Can Decline)

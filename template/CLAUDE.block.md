@@ -6,17 +6,17 @@ This project uses Automatasaurus, an automated software development workflow pow
 
 ### Two-Phase Operation
 
-**Phase 1: Planning (Interactive)**
-- Product Owner gathers requirements from user
-- Architect makes technology decisions
-- Product Owner creates GitHub issues with dependencies
+**Phase 1: Discovery (Interactive)**
+- Product Manager leads discovery conversation with user
+- Brings in specialists (Architect, Product Owner, UI/UX) as topics arise
+- Product Owner creates GitHub issues organized into milestones
 - User approves before autonomous work begins
 
 **Phase 2: Autonomous Loop (PM Coordinated)**
 - PM selects next issue based on dependencies and priority
 - Routes to specialists (UI/UX if needed)
 - Developer implements and opens PR
-- Review cycle: Architect (required), SecOps/UI-UX (optional)
+- Review cycle: Architect (required), UI/UX (optional)
 - Tester does final verification and merges
 - Loop continues until all issues complete
 
@@ -50,22 +50,72 @@ The following agents are available in `.claude/agents/`:
 | `architect` | Design, ADRs, stuck-issue analysis | Opus | **Required** |
 | `developer` | Implementation, PRs, addressing feedback | Sonnet | N/A |
 | `tester` | QA, Playwright, final merge authority | Sonnet | N/A |
-| `secops` | Security reviews | Opus | Optional (can decline) |
 | `ui-ux` | Design specs, accessibility | Sonnet | Optional (can decline) |
 
-## Agent Comment Format
+## Agent Identification (REQUIRED)
 
-**All agents MUST prefix their comments with their identity:**
+Since all agents share the same GitHub user, **every agent MUST clearly identify themselves** in ALL GitHub interactions. This is non-negotiable.
 
+### Standard Header Format
+
+Every GitHub comment, issue body, and PR description must start with:
+
+```
+**[Agent Name]**
+```
+
+### Agent Identifiers
+
+| Agent | Identifier |
+|-------|------------|
+| Product Manager | `**[PM]**` |
+| Product Owner | `**[Product Owner]**` |
+| Architect | `**[Architect]**` |
+| Developer | `**[Developer]**` |
+| Tester | `**[Tester]**` |
+| UI/UX Designer | `**[UI/UX]**` |
+
+### Where to Use
+
+**Comments (issues and PRs):**
 ```markdown
 **[PM]** Starting work on issue #5. Routing to Developer.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** LGTM. Clean separation of concerns.
-**[SecOps]** N/A - No security impact in this change.
-**[UI/UX]** N/A - No UI changes in this PR.
-**[Tester]** Verified and approved. Merging.
-**[Product Owner]** Created follow-up issue #12 for discovered scope.
 ```
+
+**Issue bodies:**
+```markdown
+**[Product Owner]**
+
+## User Story
+As a user, I want...
+```
+
+**PR descriptions:**
+```markdown
+**[Developer]**
+
+## Summary
+This PR implements...
+
+Closes #42
+```
+
+**PR reviews:**
+```markdown
+**[Architect]** Approving - clean architecture.
+
+Suggestions (not blocking):
+- Consider adding logging
+```
+
+### Why This Matters
+
+- Provides clear audit trail of which agent did what
+- Helps humans understand the workflow
+- Essential for debugging when things go wrong
+- Makes handoffs between agents visible
 
 ## State Labels
 
@@ -137,13 +187,13 @@ Primary way to invoke workflows:
 
 | Command | Description |
 |---------|-------------|
-| `/plan [feature]` | Start requirements gathering and planning |
+| `/discovery [feature]` | Start discovery to understand requirements and create plan |
 | `/work-all` | Work through all open issues autonomously |
 | `/work [issue#]` | Work on a specific issue |
 
 Examples:
 ```
-/plan user authentication system
+/discovery user authentication system
 /work-all
 /work 42
 ```
@@ -153,7 +203,6 @@ Examples:
 Agents can also be invoked explicitly:
 ```
 Use the architect agent to design the authentication system
-Use the secops agent to review this PR for security issues
 Use the tester agent to create a test plan for this feature
 Use the tester agent with playwright to verify the login flow
 ```

@@ -63,7 +63,7 @@ PM drives this loop until all issues are complete.
 │     → Developer implements (see Developer Flow below)      │
 │                                                             │
 │  5. PR REVIEW CYCLE                                         │
-│     → Reviews by Architect, SecOps, UI/UX                  │
+│     → Reviews by Architect, UI/UX                          │
 │     → Developer addresses feedback                          │
 │     (see Review Flow below)                                 │
 │                                                             │
@@ -165,22 +165,17 @@ needs-testing → [closed] (when merged)
    - Comment: "**[Architect]** ..."
    - Approve or request changes
 
-2. SecOps Review (if security-relevant)
-   - Review for vulnerabilities
-   - Comment: "**[SecOps]** ..." or "**[SecOps]** N/A - no security impact"
-   - Approve, request changes, or decline
-
-3. UI/UX Review (if UI-relevant)
+2. UI/UX Review (if UI-relevant)
    - Review visual implementation
    - Comment: "**[UI/UX]** ..." or "**[UI/UX]** N/A - no UI changes"
    - Approve, request changes, or decline
 
-4. Developer addresses feedback
+3. Developer addresses feedback
    - Comment: "**[Developer]** Fixed in {commit}..."
    - Push changes
    - Re-request review if needed
 
-5. Loop until all required approvals received
+4. Loop until all required approvals received
 ```
 
 ## Tester Flow
@@ -258,7 +253,7 @@ All agents prefix comments with their identity:
 
 **[Architect]** LGTM. Clean separation of concerns.
 
-**[SecOps]** N/A - no security impact in this change.
+**[UI/UX]** N/A - no UI changes in this PR.
 
 **[Developer]** Fixed the null check issue in commit abc123.
 

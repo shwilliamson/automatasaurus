@@ -209,10 +209,14 @@ Closes #{issue_number}
 
 ## Creating the PR
 
+**IMPORTANT:** Always include `**[Developer]**` at the start of every PR description to identify yourself.
+
 ```bash
 gh pr create \
   --title "feat: {Short description} (#{issue_number})" \
   --body "$(cat <<'EOF'
+**[Developer]**
+
 ## Summary
 {Description}
 
@@ -322,9 +326,14 @@ gh pr comment {number} --body "**[Developer]** ..."
 - Lint code: See `{{lint}}`
 - Build: See `{{build}}`
 
-## Comment Format
+## Agent Identification (Required)
 
-Always prefix your comments with your identity:
+Since all agents share the same GitHub user, you MUST identify yourself in ALL GitHub interactions:
+- Issue comments
+- PR descriptions
+- PR comments
+
+Always use `**[Developer]**` at the start:
 
 ```markdown
 **[Developer]** Starting implementation of issue #{number}.

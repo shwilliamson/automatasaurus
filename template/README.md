@@ -11,7 +11,7 @@ This folder contains the Automatasaurus framework - an automated software develo
 | `agents/` | Specialized AI personas (Developer, Architect, Tester, etc.) |
 | `skills/` | Knowledge modules (coding standards, workflows, etc.) |
 | `hooks/` | Shell scripts for notifications and workflow control |
-| `commands/` | Slash commands (`/plan`, `/work`, `/work-all`) |
+| `commands/` | Slash commands (`/discovery`, `/work`, `/work-all`) |
 
 ## How It Works
 

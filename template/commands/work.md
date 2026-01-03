@@ -29,7 +29,6 @@ You are now entering **Single Issue Workflow Mode**.
 
 5. **Coordinate PR Review**
    - Architect reviews (required)
-   - SecOps reviews if security-relevant (or declines N/A)
    - UI/UX reviews if UI-relevant (or declines N/A)
    - Developer addresses any feedback
 

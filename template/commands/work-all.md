@@ -35,7 +35,7 @@ You are now entering **Autonomous Workflow Mode**. Use the Product Manager agent
    For each issue:
    - Route to UI/UX if needed for specs
    - Delegate to Developer for implementation
-   - Coordinate PR reviews (Architect required, SecOps/UI-UX if relevant)
+   - Coordinate PR reviews (Architect required, UI/UX if relevant)
    - Delegate to Tester for final verification and merge
    - Continue to next issue
 

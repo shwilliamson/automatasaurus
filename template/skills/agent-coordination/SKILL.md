@@ -15,11 +15,10 @@ This skill provides guidance for coordinating work across the Automatasaurus per
 1. Product Owner → Define requirements, create issue
 2. Architect → Design solution, create ADR if needed
 3. UI/UX → Design user experience (if applicable)
-4. SecOps → Threat model and security requirements
-5. Developer → Implement solution
-6. Tester → Write and run tests
-7. SecOps → Security review
-8. Product Owner → Accept/reject based on criteria
+4. Developer → Implement solution
+5. Tester → Write and run tests
+6. Architect → Code review
+7. Product Owner → Accept/reject based on criteria
 ```
 
 ### Bug Fix
@@ -30,16 +29,15 @@ This skill provides guidance for coordinating work across the Automatasaurus per
 3. Architect → Consult on complex issues
 4. Developer → Implement fix
 5. Tester → Verify fix and regression test
-6. SecOps → Review if security-related
 ```
 
-### Security Incident
+### Security Issue
 
 ```
-1. SecOps → Assess and document vulnerability
+1. Architect → Assess and document vulnerability
 2. Architect → Design remediation approach
 3. Developer → Implement fix
-4. SecOps → Verify remediation
+4. Architect → Verify remediation
 5. Product Manager → Coordinate disclosure if needed
 ```
 
@@ -55,13 +53,13 @@ Use the tester agent to create test coverage
 
 ### Parallel Consultation
 ```
-Use the secops and architect agents to review this design
+Use the architect and ui-ux agents to review this design
 Use the tester and developer agents to work on test coverage
 ```
 
 ### Focused Review
 ```
-Use the secops agent to do a security review of PR #123
+Use the architect agent to review the architecture of PR #123
 Use the ui-ux agent to review the accessibility of this component
 ```
 
@@ -83,7 +81,6 @@ Each persona has quality gates that must pass:
 | Architect | ADR created for significant decisions |
 | Developer | Tests passing, PR created |
 | Tester | Test plan executed, coverage met |
-| SecOps | Security checklist passed |
 | UI/UX | Accessibility audit passed |
 
 ## Escalation
