@@ -17,7 +17,6 @@ These labels track issue progress through the workflow:
 | `in-progress` | Currently being implemented | Developer starts work |
 | `blocked` | Waiting on dependencies or input | Has unresolved blockers |
 | `needs-review` | PR open, awaiting reviews | PR created |
-| `needs-testing` | Reviews complete, awaiting tester | All reviewers approved |
 
 ### Applying State Labels
 
@@ -28,8 +27,7 @@ gh issue edit {number} --add-label "in-progress" --remove-label "ready"
 # Mark as needing review (when PR is opened)
 gh issue edit {number} --add-label "needs-review" --remove-label "in-progress"
 
-# Mark as needing testing (when reviews pass)
-gh issue edit {number} --add-label "needs-testing" --remove-label "needs-review"
+# Issue is closed automatically when PR is merged by PM
 ```
 
 ## Dependency Tracking
@@ -209,26 +207,109 @@ EOF
 )"
 ```
 
+## Comment-Based Review Tracking
+
+**IMPORTANT:** Since all agents share the same GitHub user identity, we cannot use GitHub's native multi-reviewer approval system. Instead, reviews are tracked via **standardized comments**.
+
+### How It Works
+
+1. Each required reviewer posts a standardized comment indicating their review status
+2. Product Manager monitors PR comments to verify all required reviews are complete
+3. When all required reviewers have approved via comments, PM posts the official GitHub approval and merges
+
+### Standardized Review Comment Format
+
+**Approval:**
+```
+✅ APPROVED - [Agent Role]
+[Summary of review findings]
+```
+
+**Changes Requested:**
+```
+❌ CHANGES REQUESTED - [Agent Role]
+[Specific issues to address]
+```
+
+### Required Reviews Per PR
+
+Define in PR description which reviews are required:
+
+```markdown
+## Required Reviews
+- [ ] Architect
+- [ ] Product Owner (if acceptance criteria need verification)
+```
+
+PM checks these are all satisfied via comment inspection before merging.
+
+---
+
 ## PR Review Templates
 
-All agents use the format: `**[Agent Name]** comment text`
+All agents use the format: `**[Agent Name]** comment text` with the standardized approval/rejection prefix.
 
 ### Architect (Required Reviewer)
 
 ```bash
-# Approval
-gh pr review {number} --approve --body "**[Architect]** LGTM. Clean architecture and good separation of concerns."
+# Approval - use standardized format
+gh pr comment {number} --body "**[Architect]**
 
-# Request changes
-gh pr review {number} --request-changes --body "**[Architect]** Please address the following:
+✅ APPROVED - Architect
 
+Clean architecture and good separation of concerns. LGTM."
+
+# Request changes - use standardized format
+gh pr comment {number} --body "**[Architect]**
+
+❌ CHANGES REQUESTED - Architect
+
+Please address the following:
 1. [Issue and recommendation]
 2. [Issue and recommendation]
 
 These changes are needed before merge."
 
-# Comment only
+# Comment only (not a review decision)
 gh pr comment {number} --body "**[Architect]** Consider extracting this into a separate service for better testability."
+```
+
+### Product Owner (Required for Acceptance Verification)
+
+```bash
+# Approval - acceptance criteria met
+gh pr comment {number} --body "**[Product Owner]**
+
+✅ APPROVED - Product Owner
+
+Acceptance criteria verified. Implementation matches requirements."
+
+# Request changes - acceptance criteria not met
+gh pr comment {number} --body "**[Product Owner]**
+
+❌ CHANGES REQUESTED - Product Owner
+
+Acceptance criteria issues:
+1. [Missing or incorrect requirement]
+2. [Missing or incorrect requirement]
+
+Please address before merge."
+```
+
+### Product Manager (Final Approval & Merge)
+
+```bash
+# Verify all required reviews are complete, then approve and merge
+gh pr comment {number} --body "**[Product Manager]**
+
+All required reviews complete:
+- ✅ Architect
+- ✅ Product Owner
+
+Proceeding with merge."
+
+gh pr review {number} --approve --body "**[Product Manager]** All reviews verified. Approved for merge."
+gh pr merge {number} --squash --delete-branch
 ```
 
 ### UI/UX (Optional - Can Decline)
@@ -240,32 +321,22 @@ gh pr comment {number} --body "**[UI/UX]** N/A - No UI changes in this PR.
 Reviewed: Backend/infrastructure changes only, no user-facing impact."
 
 # Approval
-gh pr review {number} --approve --body "**[UI/UX]** UI implementation looks good. Matches specs and accessibility requirements met."
+gh pr comment {number} --body "**[UI/UX]**
+
+✅ APPROVED - UI/UX
+
+UI implementation looks good. Matches specs and accessibility requirements met."
 
 # Request changes
-gh pr review {number} --request-changes --body "**[UI/UX]** UI issues found:
+gh pr comment {number} --body "**[UI/UX]**
 
+❌ CHANGES REQUESTED - UI/UX
+
+UI issues found:
 1. [Issue and fix]
 2. [Issue and fix]
 
 Please address before merge."
-```
-
-### Tester (Final Verification)
-
-```bash
-# Approval and merge
-gh pr review {number} --approve --body "**[Tester]** Verified and approved. All tests passing."
-gh pr merge {number} --squash --delete-branch
-gh pr comment {number} --body "**[Tester]** Merged successfully."
-
-# Issues found
-gh pr review {number} --request-changes --body "**[Tester]** Found issues during verification:
-
-1. [Issue description]
-2. [Issue description]
-
-Returning to Developer for fixes."
 ```
 
 ### Developer (Responding to Reviews)
@@ -299,17 +370,73 @@ gh issue comment {original_number} --body "**[Product Owner]** Created follow-up
 gh issue comment {number} --body "**[Product Owner]** Acceptance criteria met. Closing issue."
 ```
 
-### Product Manager
+### Product Manager (Issue Comments)
 
 ```bash
 # Workflow coordination
-gh issue comment {number} --body "**[PM]** Starting work on this issue. Routing to Developer."
+gh issue comment {number} --body "**[Product Manager]** Starting work on this issue. Routing to Developer."
 
 # Status update
-gh issue comment {number} --body "**[PM]** PR #{pr_number} created. Routing for reviews."
+gh issue comment {number} --body "**[Product Manager]** PR #{pr_number} created. Routing for reviews."
 
 # Completion
-gh issue comment {number} --body "**[PM]** Issue #{number} completed and merged. Moving to next issue."
+gh issue comment {number} --body "**[Product Manager]** Issue #{number} completed and merged. Moving to next issue."
+```
+
+## PR Approval Verification (PM Responsibility)
+
+The Product Manager is responsible for verifying all required reviews are complete before merging.
+
+### Checking Review Status
+
+```bash
+# Get all PR comments to check for approval comments
+gh pr view {number} --comments
+
+# Look for standardized approval comments:
+# ✅ APPROVED - Architect
+# ✅ APPROVED - Product Owner
+```
+
+### Approval Checklist
+
+Before merging, PM verifies:
+
+1. **All required reviewers have posted approval comments**
+   - Look for `✅ APPROVED - [Role]` in PR comments
+   - Architect approval is always required
+   - Product Owner approval required for feature work
+
+2. **No outstanding change requests**
+   - Check no `❌ CHANGES REQUESTED` comments without subsequent `✅ APPROVED`
+   - If changes were requested, verify they were addressed
+
+3. **Developer has addressed all feedback**
+   - Look for Developer's response comments confirming fixes
+
+### Merge Process
+
+```bash
+# 1. Verify all approvals (check comments manually)
+gh pr view {number} --comments
+
+# 2. Post verification comment
+gh pr comment {number} --body "**[Product Manager]**
+
+All required reviews complete:
+- ✅ Architect
+- ✅ Product Owner
+
+Proceeding with merge."
+
+# 3. Post official GitHub approval
+gh pr review {number} --approve --body "**[Product Manager]** All reviews verified. Approved for merge."
+
+# 4. Merge the PR
+gh pr merge {number} --squash --delete-branch
+
+# 5. Update issue label (if not auto-closed)
+gh issue edit {issue_number} --remove-label "needs-review"
 ```
 
 ## Label Management
@@ -340,7 +467,6 @@ gh label create "ready" --description "No blocking dependencies" --color "0E8A16
 gh label create "in-progress" --description "Currently being worked" --color "FBCA04"
 gh label create "blocked" --description "Waiting on dependencies" --color "D93F0B"
 gh label create "needs-review" --description "PR awaiting reviews" --color "1D76DB"
-gh label create "needs-testing" --description "Awaiting final verification" --color "5319E7"
 
 # Create priority labels
 gh label create "priority:high" --description "High priority" --color "B60205"

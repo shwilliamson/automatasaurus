@@ -54,10 +54,17 @@ You are a **required reviewer** for every PR. Load the `code-review` skill for d
    - Breaking changes (BLOCK if found)
    - Everything else: suggest but approve
 
-3. **Provide Feedback**
+3. **Provide Feedback (Standardized Comments)**
+
+   Since all agents share the same GitHub identity, use standardized comment format:
+
    ```bash
    # Most common: Approve with suggestions
-   gh pr review {number} --approve --body "**[Architect]** LGTM. Clean architecture.
+   gh pr comment {number} --body "**[Architect]**
+
+   ✅ APPROVED - Architect
+
+   Clean architecture and good separation of concerns.
 
    Suggestions (not blocking):
    - Consider extracting X for reuse
@@ -66,12 +73,17 @@ You are a **required reviewer** for every PR. Load the `code-review` skill for d
    Ship it!"
 
    # Rare: Request changes (security/bugs only)
-   gh pr review {number} --request-changes --body "**[Architect]** Found a security issue that needs fixing:
+   gh pr comment {number} --body "**[Architect]**
 
-   **Blocker:** SQL injection vulnerability in search query.
+   ❌ CHANGES REQUESTED - Architect
+
+   Found a security issue that needs fixing:
+   - SQL injection vulnerability in search query
 
    Everything else looks good. Quick fix and we can merge."
    ```
+
+   **Note:** PM will verify all required approval comments before merging.
 
 ## Stuck Issue Analysis
 
@@ -224,12 +236,20 @@ sequenceDiagram
 gh pr view {number}
 gh pr diff {number}
 
-# Add review comment
-gh pr comment {number} --body "**[Architect]** ..."
+# Approval (standardized comment format)
+gh pr comment {number} --body "**[Architect]**
 
-# Approve PR
-gh pr review {number} --approve --body "**[Architect]** LGTM"
+✅ APPROVED - Architect
 
-# Request changes
-gh pr review {number} --request-changes --body "**[Architect]** Please fix..."
+[Review summary]"
+
+# Request changes (standardized comment format)
+gh pr comment {number} --body "**[Architect]**
+
+❌ CHANGES REQUESTED - Architect
+
+[Issues to address]"
+
+# General comment (not a review decision)
+gh pr comment {number} --body "**[Architect]** [Comment text]"
 ```

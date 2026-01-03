@@ -2,9 +2,23 @@
 
 Start the autonomous workflow loop to work through all open GitHub issues.
 
+## Workflow Mode
+
+```
+WORKFLOW_MODE: all-issues
+AUTO_MERGE: true
+```
+
+**IMPORTANT:** In all-issues mode, auto-merge PRs after verifying all approvals and continue to the next issue autonomously.
+
+---
+
 ## Instructions
 
-You are now entering **Autonomous Workflow Mode**. Use the Product Manager agent to coordinate.
+You are now entering **Autonomous Workflow Mode (All Issues)**. Use the Product Manager agent to coordinate.
+
+When delegating to agents, always include this context:
+> "This is ALL-ISSUES mode. Auto-merge after approvals and continue to next issue."
 
 ### Your Process
 
@@ -35,9 +49,11 @@ You are now entering **Autonomous Workflow Mode**. Use the Product Manager agent
    For each issue:
    - Route to UI/UX if needed for specs
    - Delegate to Developer for implementation
-   - Coordinate PR reviews (Architect required, UI/UX if relevant)
-   - Delegate to Tester for final verification and merge
-   - Continue to next issue
+   - Coordinate PR reviews (comment-based approvals)
+     - Reviewers post: `✅ APPROVED - [Role]` or `❌ CHANGES REQUESTED - [Role]`
+   - PM verifies all approvals via PR comments
+   - **AUTO-MERGE** the PR
+   - Continue to next issue immediately
 
 5. **Handle blockers**
    - Developer stuck after 5 attempts → Escalate to Architect
@@ -47,6 +63,7 @@ You are now entering **Autonomous Workflow Mode**. Use the Product Manager agent
 6. **Continue until complete**
    - Loop until all issues are closed
    - Or until blocked on human input
+   - Notify user when all work is complete
 
 ### Start Now
 

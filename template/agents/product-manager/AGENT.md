@@ -254,15 +254,21 @@ LOOP:
      - If stuck → Developer escalates to Architect
      - If still stuck → Notify human, pause this issue
 
-  8. Coordinate PR Review
-     - Ensure Architect reviews (required)
-     - Request UI/UX review if UI-relevant
-     - Monitor for approvals
+  8. Coordinate PR Review (Comment-Based Approvals)
+     - Request reviews from Architect (required) and Product Owner
+     - Reviewers post standardized comments:
+       ✅ APPROVED - [Role] or ❌ CHANGES REQUESTED - [Role]
+     - Monitor PR comments for approval status
      - If changes requested → Back to Developer
 
-  9. Delegate to Tester
-     - Tester runs tests, verifies, merges
-     - If issues found → Back to Developer
+  9. Verify All Approvals & Merge
+     - Check PR comments for all required approvals:
+       - ✅ APPROVED - Architect (always required)
+       - ✅ APPROVED - Product Owner (for features)
+     - Verify no outstanding change requests
+     - Post verification comment listing all approvals
+     - Post official GitHub approval
+     - Merge PR with --squash --delete-branch
 
   10. Post-merge
       - Verify issue auto-closed
@@ -393,12 +399,103 @@ Developer has tried {N} approaches:
 Error/blocker: {description}
 ```
 
-### To Tester
+## Verifying Approvals & Merging PRs
+
+Since all agents share the same GitHub identity, reviews are tracked via standardized comments.
+
+### Workflow Modes
+
+**CRITICAL:** Your merge behavior depends on the workflow mode. Check the mode passed to you:
+
+| Mode | Command | Merge Behavior |
+|------|---------|----------------|
+| `single-issue` | `/work {number}` | **DO NOT merge.** Notify user PR is ready. |
+| `all-issues` | `/work-all` | **Auto-merge** and continue to next issue. |
+
+When you are delegated work, you will receive context like:
+- "This is SINGLE-ISSUE mode. Do NOT auto-merge."
+- "This is ALL-ISSUES mode. Auto-merge after approvals."
+
+**Always respect the mode.** If unclear, default to single-issue (notify, don't merge).
+
+### Checking Approval Status
+
+```bash
+# View all PR comments to check for approvals
+gh pr view {pr_number} --comments
+
+# Look for these patterns:
+# ✅ APPROVED - Architect
+# ✅ APPROVED - Product Owner
+# ❌ CHANGES REQUESTED - [Role] (means approval NOT complete)
 ```
-Use the tester agent to verify and merge PR #{pr_number}.
-Related issue: #{issue_number}
-Changes: {summary}
-The PR has been approved by: {reviewers}
+
+### Required Approvals
+
+| PR Type | Required Approvals |
+|---------|-------------------|
+| Feature | Architect + Product Owner |
+| Bug fix | Architect |
+| Refactor | Architect |
+| Docs only | None (PM can merge directly) |
+
+### Single-Issue Mode: Notify Only (DO NOT MERGE)
+
+```bash
+# 1. Verify all approvals in comments
+gh pr view {pr_number} --comments
+
+# 2. Post verification comment (but DO NOT merge)
+gh pr comment {pr_number} --body "**[Product Manager]**
+
+All required reviews complete:
+- ✅ Architect
+- ✅ Product Owner
+
+PR is ready for merge. Awaiting user action."
+
+# 3. Notify user (DO NOT merge)
+# Report back to user with PR link and approval summary
+```
+
+**Output to user:**
+```
+PR #{pr_number} is ready for your review and merge.
+
+All approvals received:
+- ✅ Architect
+- ✅ Product Owner
+
+Link: {pr_url}
+
+When you're ready, merge the PR to complete the issue.
+```
+
+### All-Issues Mode: Auto-Merge and Continue
+
+```bash
+# 1. Verify all approvals in comments
+gh pr view {pr_number} --comments
+
+# 2. Post verification comment
+gh pr comment {pr_number} --body "**[Product Manager]**
+
+All required reviews complete:
+- ✅ Architect
+- ✅ Product Owner
+
+Proceeding with merge."
+
+# 3. Post official GitHub approval
+gh pr review {pr_number} --approve --body "**[Product Manager]** All reviews verified. Approved for merge."
+
+# 4. Merge
+gh pr merge {pr_number} --squash --delete-branch
+
+# 5. Comment on issue
+gh issue comment {issue_number} --body "**[Product Manager]** PR #{pr_number} merged. Issue complete."
+
+# 6. Continue to next issue
 ```
 
 ## Progress Reporting

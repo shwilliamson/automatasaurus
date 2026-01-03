@@ -7,6 +7,39 @@ description: Defines the autonomous development workflow loop. Use when coordina
 
 This skill defines the Automatasaurus autonomous development workflow.
 
+## Workflow Modes
+
+The system operates in different modes depending on how work is initiated:
+
+| Mode | Command | Description | Merge Behavior |
+|------|---------|-------------|----------------|
+| `discovery` | `/discovery` | Interactive planning with user | N/A - creates issues |
+| `single-issue` | `/work {number}` | Work on one specific issue | **Notify only** - user merges |
+| `all-issues` | `/work-all` | Process all open issues | **Auto-merge** and continue |
+
+### Mode Context Passing
+
+When delegating to agents, always pass the current mode:
+
+```
+# Single-issue mode
+"This is SINGLE-ISSUE mode. Do NOT auto-merge. Notify user when PR is approved."
+
+# All-issues mode
+"This is ALL-ISSUES mode. Auto-merge after approvals and continue to next issue."
+```
+
+### Mode Enforcement
+
+**CRITICAL:** The merge step must respect the current mode:
+
+- **Single-issue mode**: After all approvals, post verification comment but **DO NOT merge**. Report to user that PR is ready.
+- **All-issues mode**: After all approvals, post verification comment, approve, **merge**, and continue to next issue.
+
+**Default behavior:** If mode is unclear, default to `single-issue` (safer - don't auto-merge).
+
+---
+
 ## Two-Phase Workflow
 
 ### Phase 1: Planning (Interactive with User)
@@ -62,13 +95,15 @@ PM drives this loop until all issues are complete.
 │  4. DEVELOPMENT                                             │
 │     → Developer implements (see Developer Flow below)      │
 │                                                             │
-│  5. PR REVIEW CYCLE                                         │
-│     → Reviews by Architect, UI/UX                          │
+│  5. PR REVIEW CYCLE (Comment-Based)                         │
+│     → Reviewers post standardized comments                 │
+│       ✅ APPROVED - [Role] or ❌ CHANGES REQUESTED - [Role] │
 │     → Developer addresses feedback                          │
 │     (see Review Flow below)                                 │
 │                                                             │
-│  6. TESTING & MERGE                                         │
-│     → Tester verifies and merges                           │
+│  6. PM VERIFIES & MERGES                                    │
+│     → PM checks all required approvals via comments        │
+│     → PM posts verification, approves, and merges          │
 │                                                             │
 │  7. POST-MERGE                                              │
 │     - Verify issue closed                                   │
@@ -110,9 +145,7 @@ ready → in-progress (when selected)
      ↓
 in-progress → needs-review (when PR opened)
      ↓
-needs-review → needs-testing (when reviews complete)
-     ↓
-needs-testing → [closed] (when merged)
+needs-review → [closed] (when PM verifies approvals and merges)
 ```
 
 | Label | Meaning |
@@ -121,7 +154,6 @@ needs-testing → [closed] (when merged)
 | `in-progress` | Currently being implemented |
 | `blocked` | Waiting on dependencies or human input |
 | `needs-review` | PR open, awaiting code reviews |
-| `needs-testing` | Reviews approved, awaiting tester |
 | `priority:high` | Work on first |
 | `priority:medium` | Normal priority |
 | `priority:low` | Work on last |
@@ -157,55 +189,107 @@ needs-testing → [closed] (when merged)
    - Update issue label to "needs-review"
 ```
 
-## Review Flow
+## Review Flow (Comment-Based)
+
+Since all agents share the same GitHub user, reviews are tracked via standardized comments.
+
+### Standardized Review Comments
+
+**Approval:**
+```
+✅ APPROVED - [Agent Role]
+[Summary of review findings]
+```
+
+**Changes Requested:**
+```
+❌ CHANGES REQUESTED - [Agent Role]
+[Specific issues to address]
+```
+
+### Review Process
 
 ```
 1. Architect Review (REQUIRED)
    - Review code quality, patterns, architecture
-   - Comment: "**[Architect]** ..."
-   - Approve or request changes
+   - Post standardized comment: "**[Architect]** ✅ APPROVED - Architect ..."
+   - Or request changes: "**[Architect]** ❌ CHANGES REQUESTED - Architect ..."
 
-2. UI/UX Review (if UI-relevant)
+2. Product Owner Review (for features)
+   - Verify acceptance criteria are met
+   - Post standardized comment: "**[Product Owner]** ✅ APPROVED - Product Owner ..."
+
+3. UI/UX Review (if UI-relevant)
    - Review visual implementation
-   - Comment: "**[UI/UX]** ..." or "**[UI/UX]** N/A - no UI changes"
-   - Approve, request changes, or decline
+   - Post: "**[UI/UX]** ✅ APPROVED - UI/UX ..." or "**[UI/UX]** N/A - no UI changes"
 
-3. Developer addresses feedback
+4. Developer addresses feedback
    - Comment: "**[Developer]** Fixed in {commit}..."
    - Push changes
-   - Re-request review if needed
+   - Wait for updated review comments
 
-4. Loop until all required approvals received
-```
-
-## Tester Flow
-
-```
-1. Run automated tests
-   - Execute full test suite
-   - Verify all tests pass
-
-2. Decide on manual verification
-   Consider:
-   - Does issue involve UI? → Playwright testing
-   - Is it a critical path? → Manual verification
-   - Is it low-risk refactor? → Automated only may suffice
-
-3. Manual verification (if needed)
-   - Use Playwright MCP for browser testing
-   - Verify acceptance criteria met
-   - Document verification in PR comment
-
-4. If issues found
-   - Comment: "**[Tester]** Found issues: ..."
-   - Request changes
-   - Back to Developer
-
-5. If all good
-   - Comment: "**[Tester]** Verified and approved"
-   - Approve PR
+5. PM Verifies & Merges
+   - Check PR comments for all required approvals
+   - Post verification comment listing approvals
+   - Post official GitHub approval
    - Merge PR
-   - Verify issue auto-closed
+```
+
+## PM Verification & Merge Flow
+
+**CRITICAL:** Behavior depends on workflow mode. Check context passed to you.
+
+### Step 1-3: Same for Both Modes
+
+```
+1. Check PR comments for required approvals
+   - Look for: ✅ APPROVED - Architect
+   - Look for: ✅ APPROVED - Product Owner (for features)
+   - Verify no outstanding ❌ CHANGES REQUESTED
+
+2. Verify tests pass
+   - Check CI status on PR
+   - Ensure all automated tests green
+
+3. Post verification comment
+   gh pr comment {number} --body "**[Product Manager]**
+
+   All required reviews complete:
+   - ✅ Architect
+   - ✅ Product Owner
+
+   [Mode-specific message - see below]"
+```
+
+### Single-Issue Mode: STOP and Notify
+
+```
+4. DO NOT MERGE - Report to user instead:
+   "PR #{number} is ready for your review and merge.
+
+   All approvals received:
+   - ✅ Architect
+   - ✅ Product Owner
+
+   Link: {pr_url}
+
+   When you're ready, merge the PR to complete the issue."
+
+5. STOP - Wait for user to merge
+```
+
+### All-Issues Mode: Auto-Merge and Continue
+
+```
+4. Approve and merge
+   gh pr review {number} --approve --body "**[Product Manager]** All reviews verified."
+   gh pr merge {number} --squash --delete-branch
+
+5. Verify issue auto-closed
+   - Check issue state
+   - Comment on issue confirming completion
+
+6. Continue to next issue
 ```
 
 ## Escalation Procedures
@@ -251,13 +335,36 @@ All agents prefix comments with their identity:
 ```markdown
 **[Product Owner]** Added acceptance criteria for edge case handling.
 
-**[Architect]** LGTM. Clean separation of concerns.
+**[Architect]** Consider extracting this into a separate service.
 
 **[UI/UX]** N/A - no UI changes in this PR.
 
 **[Developer]** Fixed the null check issue in commit abc123.
 
-**[Tester]** Verified login flow works correctly. Approved.
+**[Product Manager]** All reviews verified. Merging PR.
+```
+
+### Standardized Review Comments
+
+For PR reviews, use standardized format so PM can verify approvals:
+
+```markdown
+**[Architect]**
+
+✅ APPROVED - Architect
+
+Clean separation of concerns. LGTM.
+```
+
+```markdown
+**[Product Owner]**
+
+❌ CHANGES REQUESTED - Product Owner
+
+Acceptance criteria issue:
+- Missing validation for email field
+
+Please address before merge.
 ```
 
 ## GitHub Commands Reference

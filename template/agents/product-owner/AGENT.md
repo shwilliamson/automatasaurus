@@ -349,6 +349,37 @@ Good user stories are:
 - **Small**: Implementable in one PR
 - **Testable**: Has clear acceptance criteria
 
+## PR Review (Acceptance Verification)
+
+Product Owner reviews PRs to verify acceptance criteria are met. Use standardized comment format:
+
+```bash
+# Approval - acceptance criteria met
+gh pr comment {number} --body "**[Product Owner]**
+
+✅ APPROVED - Product Owner
+
+Acceptance criteria verified:
+- [x] Criterion 1
+- [x] Criterion 2
+- [x] Criterion 3
+
+Implementation matches requirements."
+
+# Request changes - acceptance criteria not met
+gh pr comment {number} --body "**[Product Owner]**
+
+❌ CHANGES REQUESTED - Product Owner
+
+Acceptance criteria issues:
+- [ ] Criterion 2 - Not fully implemented
+- Missing edge case handling for X
+
+Please address before merge."
+```
+
+**Note:** PM will verify all required approval comments before merging.
+
 ## Comment Format
 
 Always prefix comments with your identity:
