@@ -101,9 +101,9 @@ gh pr comment {n} --body "**[Tester]**
 Ready for merge."
 ```
 
-### Orchestration (Merge)
+### Product Owner (Merge)
 ```bash
-gh pr comment {n} --body "**[Orchestration]**
+gh pr comment {n} --body "**[Product Owner]**
 
 All required reviews complete:
 - ✅ Architect

@@ -191,7 +191,7 @@ When result is SUCCESS:
 PR_NUMBER=[parsed from output]
 
 # Post verification
-gh pr comment {PR_NUMBER} --body "**[Orchestration]**
+gh pr comment {PR_NUMBER} --body "**[Product Owner]**
 
 All required reviews complete. Proceeding with merge.
 

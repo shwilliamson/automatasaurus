@@ -36,7 +36,7 @@ Follow the work-issue skill steps:
 When the skill workflow completes with SUCCESS:
 
 ```bash
-gh pr comment {pr_number} --body "**[Orchestration]**
+gh pr comment {pr_number} --body "**[Product Owner]**
 
 All required reviews complete:
 - ✅ Architect
