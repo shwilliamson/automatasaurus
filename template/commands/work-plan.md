@@ -52,7 +52,78 @@ Build a dependency graph:
 
 ---
 
-## Phase 3: Determine Sequence
+## Phase 3: Design Language & Style Guide
+
+Before implementation begins, spawn the Designer agent to establish the visual foundation:
+
+```
+Use the Task tool with:
+  subagent_type: "general-purpose"
+  model: "sonnet"
+  description: "Create design language"
+  prompt: |
+    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
+
+    **[Designer]**
+
+    Establish the design language and style guide for this project.
+
+    1. Check for existing design documentation:
+       - Look for `design-system.md`, `DESIGN.md`, `style-guide.md`, or similar
+       - Check for design tokens in the codebase (CSS variables, theme files)
+       - Look in `/docs`, `/design`, or project root
+    2. Review the open issues to understand the scope and UI needs
+    3. Analyze the existing codebase for current patterns and styling
+    4. If design docs exist: review and extend them as needed
+       If no design docs exist: create `design-system.md` with:
+
+    ## Color Palette
+    - Primary colors (brand identity, CTAs)
+    - Secondary colors (accents, highlights)
+    - Neutral colors (backgrounds, text, borders)
+    - Semantic colors (success, warning, error, info)
+    - Include hex values and CSS custom properties
+
+    ## Typography
+    - Font families (headings, body, monospace)
+    - Type scale (sizes, line heights, weights)
+    - Text styles for each context
+
+    ## Spacing & Layout
+    - Spacing scale (4px, 8px, 16px, etc.)
+    - Container widths and breakpoints
+    - Grid system (if applicable)
+
+    ## Components
+    - Button styles (primary, secondary, ghost, sizes)
+    - Form inputs (text, select, checkbox, radio)
+    - Cards and containers
+    - Navigation patterns
+    - Feedback elements (alerts, toasts, modals)
+
+    ## Interaction Patterns
+    - Hover, focus, and active states
+    - Transitions and animations
+    - Loading states
+    - Empty states
+
+    ## Accessibility Standards
+    - Minimum contrast ratios
+    - Focus indicators
+    - Touch target sizes
+
+    The goal is an intuitive, polished user experience with appealing colors
+    that work harmoniously together. The design should feel modern and cohesive.
+
+    Output: Write the design system to `design-system.md` (or update existing).
+    Return the path to the design document when complete.
+```
+
+The design system lives in its own file, separate from the implementation plan.
+
+---
+
+## Phase 4: Determine Sequence
 
 Apply these criteria to determine work order:
 
@@ -74,7 +145,7 @@ Apply these criteria to determine work order:
 
 ---
 
-## Phase 4: Create Implementation Plan
+## Phase 5: Create Implementation Plan
 
 Write `implementation-plan.md`:
 
@@ -123,6 +194,12 @@ Based on: [N] open issues across [M] milestones
         └── #5 (Session Mgmt)
 ```
 
+## Design Foundation
+
+**Design System:** [link to design-system.md]
+
+All UI implementations must follow the design system for a cohesive user experience.
+
 ## Blockers & Risks
 
 - [Any issues that seem risky or unclear]
@@ -137,12 +214,17 @@ Based on: [N] open issues across [M] milestones
 
 ---
 
-## Phase 5: Present to User
+## Phase 6: Present to User
 
 Show the plan summary:
 
 ```
 I've analyzed [N] open issues and created an implementation plan.
+
+**Design System:**
+- Style guide created in `design-system.md`
+- Color palette, typography, and component patterns defined
+- Accessibility standards documented
 
 **Milestones:**
 - [Milestone 1]: [X] issues
