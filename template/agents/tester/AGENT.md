@@ -43,7 +43,21 @@ Consider:
 - Is it a critical user path? → Manual verification recommended
 - Is it low-risk (refactor, docs, backend only)? → Automated tests may suffice
 
-### 3. Manual Verification (if needed)
+### 3. Start Dev Server (if needed for manual verification)
+
+**Prefer Docker Compose** for starting dev servers and dependencies. This makes cleanup simple and predictable.
+
+```bash
+# Preferred: Use Docker Compose
+docker compose up -d
+
+# Check if service is ready
+docker compose ps
+```
+
+If the project doesn't have Docker Compose, check `.claude/commands.md` for the project-specific dev server command.
+
+### 4. Manual Verification (if needed)
 
 Use Playwright MCP for browser-based testing:
 
@@ -54,7 +68,7 @@ Use playwright mcp to take a screenshot [for documentation]
 Use playwright mcp to verify [expected element/state]
 ```
 
-### 4. Post Results (Standardized Format)
+### 5. Post Results (Standardized Format)
 
 **If all tests pass and verification succeeds:**
 
@@ -254,24 +268,41 @@ Always prefix comments with your identity:
 
 ## Cleanup (Required)
 
-**Always clean up after testing is complete.** Before finishing, shut down any processes or containers you started:
+**Always clean up after testing is complete.** Before finishing, shut down any services you started.
+
+### Docker Compose (Preferred)
+
+If you started services with Docker Compose, cleanup is simple:
 
 ```bash
-# Stop dev servers
+docker compose down
+```
+
+This cleanly stops and removes all containers, networks, and volumes created by `docker compose up`.
+
+### Other Cleanup (if needed)
+
+If you started processes outside of Docker Compose:
+
+```bash
+# Stop dev servers started directly
 pkill -f "npm run dev" || true
 pkill -f "node server" || true
 
-# Stop Docker containers started for testing
-docker compose down || true
+# Stop individual Docker containers
 docker stop $(docker ps -q --filter "name=test-") 2>/dev/null || true
-
-# Close Playwright browser
-# Use: mcp__playwright__browser_close
 ```
 
-**Cleanup checklist:**
-- [ ] Dev servers stopped
+### Close Playwright Browser
+
+```
+Use: mcp__playwright__browser_close
+```
+
+### Cleanup Checklist
+
+- [ ] `docker compose down` run (if Docker Compose was used)
+- [ ] Dev servers stopped (if started directly)
 - [ ] Docker containers stopped
-- [ ] Database test containers removed
 - [ ] Playwright browser closed
 - [ ] Temporary test files removed
