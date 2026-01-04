@@ -6,7 +6,7 @@ Autonomously work through all open GitHub issues using context-isolated subagent
 
 ```
 WORKFLOW_MODE: all-issues
-AUTO_MERGE: true (handled by this orchestrator after /work completes)
+AUTO_MERGE: true (handled by this orchestrator (aka Product Owner) after /work completes)
 ```
 
 ---

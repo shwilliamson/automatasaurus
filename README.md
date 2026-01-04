@@ -320,7 +320,7 @@ This step helps you review and approve the execution order before `/work-all` be
 /work-all
 ```
 
-The orchestrator will:
+The orchestrator (aka Product Owner) will:
 - List all remaining issues
 - Select next issue based on dependencies and priority
 - Spawn `/work {n}` as a subagent for context isolation

@@ -20,7 +20,7 @@ This project uses Automatasaurus, an automated software development workflow pow
 - Tester verifies, then orchestration merges
 - Loop continues until all issues complete or limits reached
 
-**Note:** Commands (`/discovery`, `/work`, `/work-all`) act as the orchestrator. There is no separate PM agent.
+**Note:** Commands (`/discovery`, `/work`, `/work-all`) act as the product owner / orchestrator.
 
 ### Escalation Flow
 
