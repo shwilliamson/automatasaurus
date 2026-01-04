@@ -528,6 +528,14 @@ Contributions welcome:
 - Workflow patterns
 - CLI tool development
 
+## Publishing to npm
+
+```bash
+npm publish --auth-type=web
+```
+
+This opens a browser for authentication (works with passkeys/security keys).
+
 ## References
 
 - [Claude Code Documentation](https://code.claude.com/docs)
