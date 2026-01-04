@@ -21,7 +21,16 @@
     "ai",
     "development"
   ],
-  "author": "",
+  "author": {
+    "name": "Stuart Williamson",
+    "email": "s.h.williamson@gmail.com",
+    "url": "https://github.com/shwilliamson"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shwilliamson/automatasaurus"
+  },
+  "homepage": "https://github.com/shwilliamson/automatasaurus#readme",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
