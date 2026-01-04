@@ -33,7 +33,8 @@ Before writing code:
 5. Implement with frequent commits
 6. Write and run tests (track attempts)
 7. Self-review for obvious issues
-8. Open PR with comprehensive description
+8. Sync with main and resolve any conflicts
+9. Open PR with comprehensive description
 ```
 
 ## Branch Naming
@@ -131,6 +132,26 @@ gh issue edit {issue} --add-label "needs-review" --remove-label "in-progress"
 2. Address each piece of feedback
 3. Reply with `**[Developer]**` prefix
 4. Push and notify: `gh pr comment {pr} --body "**[Developer]** Addressed feedback."`
+
+## Pre-PR Merge Check
+
+Before opening or handing off a PR, ensure your branch can merge cleanly:
+
+```bash
+# Fetch latest and check for conflicts
+git fetch origin
+git merge origin/main --no-commit --no-ff
+
+# If conflicts exist, resolve them:
+git merge --abort  # if you want to start over
+# OR resolve conflicts, then:
+git add . && git commit -m "chore: merge main (#{issue})"
+
+# If no conflicts, abort the test merge and proceed
+git merge --abort
+```
+
+**Never hand off a PR that has merge conflicts.** The reviewer/tester should not have to resolve your conflicts.
 
 ## Agent Identification (Required)
 

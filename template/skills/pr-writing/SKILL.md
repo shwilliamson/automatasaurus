@@ -238,6 +238,7 @@ Before marking ready for review:
 - [ ] Screenshots added for UI changes
 - [ ] Breaking changes are highlighted
 - [ ] Self-reviewed the diff for obvious issues
+- [ ] Branch is synced with main (no merge conflicts)
 
 ## PR Size Guidelines
 
