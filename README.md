@@ -100,7 +100,7 @@ User: /work-all
 │    - If issues → Back to Developer                                 │
 │                                                                     │
 │ 6. Merge and continue                                               │
-│    - Orchestration merges PR                                       │
+│    - Product Owner merges PR                                       │
 │    - Loop until complete or limits reached                         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -121,7 +121,7 @@ User: /work-all
 All agents prefix their comments with their identity:
 
 ```markdown
-**[Orchestration]** Starting work on issue #5. Routing to Developer.
+**[Product Owner]** Starting work on issue #5. Routing to Developer.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** ✅ APPROVED - Architect. Clean separation of concerns.
 **[Designer]** N/A - No UI changes in this PR.

@@ -74,20 +74,20 @@ Every GitHub comment, issue body, and PR description must start with:
 | Designer | `**[Designer]**` |
 | Developer | `**[Developer]**` |
 | Tester | `**[Tester]**` |
-| Orchestration | `**[Orchestration]**` |
+| Product Owner | `**[Product Owner]**` |
 
 ### Where to Use
 
 **Comments (issues and PRs):**
 ```markdown
-**[Orchestration]** Starting work on issue #5. Routing to Developer.
+**[Product Owner]** Starting work on issue #5. Routing to Developer.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** LGTM. Clean separation of concerns.
 ```
 
 **Issue bodies:**
 ```markdown
-**[Orchestration]**
+**[Product Owner]**
 
 ## User Story
 As a user, I want...

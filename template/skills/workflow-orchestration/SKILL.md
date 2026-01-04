@@ -261,7 +261,7 @@ gh issue view {n} --json body --jq '.body' | grep -oE 'Depends on #[0-9]+'
 gh pr view {n} --comments
 
 # Post orchestration comment
-gh pr comment {n} --body "**[Orchestration]** ..."
+gh pr comment {n} --body "**[Product Owner]** ..."
 
 # Merge PR
 gh pr merge {n} --squash --delete-branch

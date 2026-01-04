@@ -33,7 +33,7 @@ Guidelines for creating well-structured GitHub issues that enable efficient auto
 ## Issue Template
 
 ```markdown
-**[Orchestration]**
+**[Product Owner]**
 
 ## User Story
 As a [user type],
