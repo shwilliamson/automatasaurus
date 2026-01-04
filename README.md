@@ -203,11 +203,31 @@ your-project/
 
 ## Installation
 
+### From npm (recommended)
+
 ```bash
 # Initialize automatasaurus in your project
 cd your-project
 npx automatasaurus init
 ```
+
+### From local build
+
+To install from a local checkout (useful for testing changes before publishing):
+
+```bash
+# In the automatasaurus repo
+npm pack                    # Creates automatasaurus-x.x.x.tgz
+
+# In your target project
+cd your-project
+npm install /path/to/automatasaurus/automatasaurus-x.x.x.tgz
+npx automatasaurus init
+```
+
+This approach tests exactly what would be published to npm, catching any packaging issues like missing files.
+
+### What init does
 
 This will:
 1. Copy framework files to `.automatasaurus/` directory

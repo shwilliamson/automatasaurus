@@ -1,4 +1,12 @@
 {
+  "automatasaurus": {
+    "limits": {
+      "maxIssuesPerRun": 20,
+      "maxEscalationsBeforeStop": 3,
+      "maxRetriesPerIssue": 5,
+      "maxConsecutiveFailures": 3
+    }
+  },
   "permissions": {
     "allow": [
       "Bash(git:*)",

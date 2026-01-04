@@ -1,24 +1,24 @@
 # Work All - Process All Open Issues
 
-Autonomously work through all open GitHub issues.
+Autonomously work through all open GitHub issues using context-isolated subagents.
 
 ## Workflow Mode
 
 ```
 WORKFLOW_MODE: all-issues
-AUTO_MERGE: true
+AUTO_MERGE: true (handled by this orchestrator after /work completes)
 ```
-
-**IMPORTANT:** In all-issues mode, auto-merge PRs after verifying all approvals and continue to the next issue autonomously.
 
 ---
 
 ## Instructions
 
-You are now the **Autonomous Implementation Orchestrator**.
-
-When delegating to agents, always include:
-> "This is ALL-ISSUES mode. Auto-merge after approvals and continue to next issue."
+You are the **Autonomous Implementation Orchestrator**. You:
+1. Select issues based on dependencies and priority
+2. Spawn `/work {n}` as a subagent for each issue (context isolation)
+3. Parse subagent output to determine result
+4. Merge successful PRs
+5. Enforce circuit breaker limits
 
 ---
 
@@ -27,6 +27,26 @@ When delegating to agents, always include:
 1. Load the `workflow-orchestration` skill
 2. Load the `github-workflow` skill
 3. Check for `implementation-plan.md` (if exists, follow it)
+4. Read circuit breaker limits from `.claude/settings.json` under `automatasaurus.limits`
+
+---
+
+## Circuit Breaker Limits
+
+Before each iteration, check limits from settings:
+
+| Limit | Default | Action When Exceeded |
+|-------|---------|---------------------|
+| `maxIssuesPerRun` | 20 | Stop, report progress |
+| `maxEscalationsBeforeStop` | 3 | Stop, notify human |
+| `maxConsecutiveFailures` | 3 | Stop, notify human |
+
+Initialize counters:
+```
+issuesProcessed = 0
+escalationCount = 0
+consecutiveFailures = 0
+```
 
 ---
 
@@ -34,32 +54,36 @@ When delegating to agents, always include:
 
 ```
 LOOP:
-  1. LIST OPEN ISSUES
+  1. CHECK LIMITS
+     - If issuesProcessed >= maxIssuesPerRun → Stop (limit reached)
+     - If escalationCount >= maxEscalationsBeforeStop → Stop (escalation limit)
+     - If consecutiveFailures >= maxConsecutiveFailures → Stop (failure limit)
+
+  2. LIST OPEN ISSUES
      - Check milestones and priorities
      - If no open issues → Notify complete, exit
 
-  2. SELECT NEXT ISSUE
+  3. SELECT NEXT ISSUE
      - Follow implementation-plan.md if exists
      - Otherwise use selection criteria (see below)
+     - Check dependencies (skip if blocked)
 
-  3. IMPLEMENT ISSUE
-     - Check dependencies (all closed?)
-     - Get design specs if needed
-     - Delegate to Developer
+  4. SPAWN /work SUBAGENT
+     - Use Task tool to spawn: "Run /work {issue_number}"
+     - Wait for completion
+     - Parse output for result
 
-  4. COORDINATE REVIEWS
-     - Architect review (required)
-     - Designer review (if UI)
-     - Tester review (required)
-     - Handle change requests
+  5. PARSE RESULT
+     - SUCCESS: Output contains "PR #X is ready" or "All required reviews complete"
+     - BLOCKED: Output contains "blocked" or "dependency"
+     - ESCALATED: Output contains "Escalating" or "stuck"
 
-  5. VERIFY & MERGE
-     - Check all approvals received
-     - Post verification comment
-     - Merge PR
-     - Verify issue closed
+  6. HANDLE RESULT
+     - SUCCESS: Merge PR, reset consecutiveFailures, increment issuesProcessed
+     - BLOCKED: Skip issue, continue to next
+     - ESCALATED: Increment escalationCount, consecutiveFailures
 
-  6. CONTINUE
+  7. CONTINUE
      - Report progress
      - Loop back to step 1
 
@@ -89,150 +113,131 @@ If no `implementation-plan.md` exists, select issues by:
 
 ---
 
-## For Each Issue
+## Spawning /work Subagent
 
-### Step 1: Check Dependencies
+For each selected issue:
+
+```
+Use the Task tool with prompt:
+"Run /work {issue_number}
+
+Work on this single issue. Create PR and get all required reviews.
+Report final status clearly."
+```
+
+The subagent runs with isolated context. When it completes, parse its output.
+
+---
+
+## Result Parsing
+
+After subagent completes, check output for:
+
+**SUCCESS indicators:**
+- "PR #X is ready"
+- "All required reviews complete"
+- "ready for merge"
+
+**BLOCKED indicators:**
+- "blocked"
+- "dependency"
+- "cannot proceed"
+
+**ESCALATED indicators:**
+- "Escalating"
+- "stuck"
+- "requires human"
+- "unable to resolve"
+
+---
+
+## Merge on Success
+
+When result is SUCCESS:
 
 ```bash
-gh issue view {number} --json body --jq '.body' | grep -oE 'Depends on #[0-9]+' | grep -oE '[0-9]+'
-```
+# Get PR number from subagent output
+PR_NUMBER=[parsed from output]
 
-If any dependency is open, skip to next issue.
-
-### Step 2: Get Design Specs (If UI)
-
-```
-Use the designer agent to add UI/UX specifications to issue #{number}.
-```
-
-### Step 3: Delegate to Developer
-
-```
-Use the developer agent to implement issue #{number}.
-
-Context:
-- Issue: [title]
-- Acceptance criteria: [from issue body]
-- Design specs: [if applicable]
-
-This is ALL-ISSUES mode. Create PR when implementation is complete.
-```
-
-### Step 4: Coordinate Reviews
-
-**Architect:**
-```
-Use the architect agent to review PR #{pr_number} for technical quality.
-```
-
-**Designer (if UI):**
-```
-Use the designer agent to review PR #{pr_number} for UI/UX quality.
-```
-
-**Tester:**
-```
-Use the tester agent to verify PR #{pr_number}.
-Run tests and perform manual verification if needed.
-```
-
-### Step 5: Handle Change Requests
-
-If `❌ CHANGES REQUESTED`:
-```
-Use the developer agent to address the review feedback on PR #{pr_number}.
-```
-
-Then re-request the relevant review.
-
-### Step 6: Verify & Merge
-
-Check for all required approvals:
-- `✅ APPROVED - Architect`
-- `✅ APPROVED - Designer` (if UI)
-- `✅ APPROVED - Tester`
-
-```bash
 # Post verification
-gh pr comment {pr_number} --body "**[Orchestration]**
+gh pr comment {PR_NUMBER} --body "**[Orchestration]**
 
-All required reviews complete:
-- ✅ Architect
-- ✅ Tester
+All required reviews complete. Proceeding with merge.
 
-Proceeding with merge."
-
-# Approve
-gh pr review {pr_number} --approve --body "**[Orchestration]** All reviews verified."
+Issue processed: {issuesProcessed + 1} of max {maxIssuesPerRun}"
 
 # Merge
-gh pr merge {pr_number} --squash --delete-branch
+gh pr merge {PR_NUMBER} --squash --delete-branch
 
 # Verify issue closed
 gh issue view {issue_number} --json state --jq '.state'
 ```
 
-### Step 7: Report & Continue
+---
+
+## Progress Reporting
+
+After each issue:
 
 ```
-Issue #{number} complete. PR #{pr_number} merged.
-
-Progress: [X/Y] issues complete
-Current milestone: [milestone] - [a/b] complete
-
-Continuing to next issue...
+Issue #{number}: [SUCCESS/BLOCKED/ESCALATED]
+Progress: {issuesProcessed}/{maxIssuesPerRun} issues
+Escalations: {escalationCount}/{maxEscalationsBeforeStop}
+Current milestone: [name] - [x/y] complete
 ```
 
 ---
 
-## Handling Blockers
+## Stopping Conditions
 
-### Developer Stuck (After 5 Attempts)
+Stop the loop when ANY of these occur:
 
-```
-Use the architect agent to analyze the stuck issue #{number}.
-
-Developer has tried:
-1. [attempt 1]
-2. [attempt 2]
-...
-
-Error: [error message]
-```
-
-If Architect also stuck → Notify human:
-```bash
-.claude/hooks/request-attention.sh stuck "Unable to resolve issue #{number}. [description]"
-```
-
-Mark issue as blocked and continue to next issue.
-
-### All Issues Blocked
-
-If all remaining issues are blocked:
-```bash
-.claude/hooks/request-attention.sh stuck "All issues blocked. Circular dependency or external blocker."
-```
+1. **All issues complete** → Notify success
+2. **Limit reached** (`maxIssuesPerRun`) → Report progress, suggest continuing later
+3. **Escalation limit** (`maxEscalationsBeforeStop`) → Notify human intervention needed
+4. **Failure limit** (`maxConsecutiveFailures`) → Notify something is wrong
+5. **All remaining issues blocked** → Notify circular dependency or external blocker
 
 ---
 
-## Completion
+## Completion Notifications
 
-When all issues are closed:
-
+**All complete:**
 ```bash
 .claude/hooks/request-attention.sh complete "All issues implemented and merged!"
 ```
 
-Report final summary:
+**Limit reached:**
+```bash
+.claude/hooks/request-attention.sh info "Processed {n} issues. Run /work-all again to continue."
 ```
-All work complete!
 
-Completed: [N] issues
-Milestones finished: [list]
-Total PRs merged: [N]
+**Escalation/Failure limit:**
+```bash
+.claude/hooks/request-attention.sh stuck "Stopped after {n} escalations. Human intervention needed."
 ```
 
 ---
 
-Begin by listing all open issues and selecting the first one to work on.
+## Final Summary
+
+When stopping for any reason:
+
+```
+## Work-All Summary
+
+**Status:** [Complete / Limit Reached / Stopped - Human Needed]
+
+**Issues Processed:** {issuesProcessed}
+**Successful Merges:** {successCount}
+**Blocked:** {blockedCount}
+**Escalated:** {escalatedCount}
+
+**Remaining Open Issues:** {count}
+
+[If applicable: Suggest next steps]
+```
+
+---
+
+Begin by loading skills, reading limits from settings, then listing all open issues.

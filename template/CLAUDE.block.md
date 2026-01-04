@@ -7,18 +7,20 @@ This project uses Automatasaurus, an automated software development workflow pow
 ### Two-Phase Operation
 
 **Phase 1: Discovery (Interactive)**
-- Product Manager leads discovery conversation with user
-- Brings in specialists (Architect, Product Owner, UI/UX) as topics arise
-- Product Owner creates GitHub issues organized into milestones
+- `/discovery` command facilitates requirements conversation with user
+- Brings in specialists (Architect, Designer) for review as topics arise
+- Creates GitHub issues organized into milestones
 - User approves before autonomous work begins
 
-**Phase 2: Autonomous Loop (PM Coordinated)**
-- PM selects next issue based on dependencies and priority
-- Routes to specialists (UI/UX if needed)
+**Phase 2: Autonomous Loop (Command Orchestrated)**
+- `/work-all` command selects next issue based on dependencies and priority
+- Routes to Designer for specs if UI work needed
 - Developer implements and opens PR
-- Review cycle: Architect (required), UI/UX (optional)
-- Tester does final verification and merges
-- Loop continues until all issues complete
+- Review cycle: Architect (required), Designer (if UI)
+- Tester verifies, then orchestration merges
+- Loop continues until all issues complete or limits reached
+
+**Note:** Commands (`/discovery`, `/work`, `/work-all`) act as the orchestrator. There is no separate PM agent.
 
 ### Escalation Flow
 
@@ -39,18 +41,18 @@ Common command categories:
 - `build` - Build for production
 - `lint` - Check code style
 
-## Personas/Agents
+## Agents
 
 The following agents are available in `.claude/agents/`:
 
 | Agent | Role | Model | Review Status |
 |-------|------|-------|---------------|
-| `product-owner` | Requirements, issues, follow-ups | Opus | N/A |
-| `product-manager` | Workflow coordinator, drives the loop | Sonnet | N/A |
-| `architect` | Design, ADRs, stuck-issue analysis | Opus | **Required** |
+| `architect` | System design, ADRs, stuck-issue analysis, PR review | Opus | **Required** |
+| `designer` | UI/UX specs, accessibility, design review | Sonnet | If UI changes |
 | `developer` | Implementation, PRs, addressing feedback | Sonnet | N/A |
-| `tester` | QA, Playwright, final merge authority | Sonnet | N/A |
-| `ui-ux` | Design specs, accessibility | Sonnet | Optional (can decline) |
+| `tester` | QA, Playwright, verification | Sonnet | **Required** |
+
+**Note:** Commands handle orchestration. Agents are autonomous workers invoked by commands.
 
 ## Agent Identification (REQUIRED)
 
@@ -68,25 +70,24 @@ Every GitHub comment, issue body, and PR description must start with:
 
 | Agent | Identifier |
 |-------|------------|
-| Product Manager | `**[PM]**` |
-| Product Owner | `**[Product Owner]**` |
 | Architect | `**[Architect]**` |
+| Designer | `**[Designer]**` |
 | Developer | `**[Developer]**` |
 | Tester | `**[Tester]**` |
-| UI/UX Designer | `**[UI/UX]**` |
+| Orchestration | `**[Orchestration]**` |
 
 ### Where to Use
 
 **Comments (issues and PRs):**
 ```markdown
-**[PM]** Starting work on issue #5. Routing to Developer.
+**[Orchestration]** Starting work on issue #5. Routing to Developer.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** LGTM. Clean separation of concerns.
 ```
 
 **Issue bodies:**
 ```markdown
-**[Product Owner]**
+**[Orchestration]**
 
 ## User Story
 As a user, I want...
@@ -275,4 +276,29 @@ Notifications are also sent automatically on stop based on context.
 | `GITHUB_WORKFLOW` | Set to "enabled" for GitHub integration |
 | `AUTOMATASAURUS_SOUND` | Set to "false" to disable notification sounds |
 | `AUTOMATASAURUS_LOG` | Custom log file location |
-| `MAX_RETRY_ATTEMPTS` | Number of attempts before escalation (default: 5) |
+
+## Circuit Breaker Configuration
+
+Limits are configured in `.claude/settings.json` under `automatasaurus.limits`:
+
+```json
+{
+  "automatasaurus": {
+    "limits": {
+      "maxIssuesPerRun": 20,
+      "maxEscalationsBeforeStop": 3,
+      "maxRetriesPerIssue": 5,
+      "maxConsecutiveFailures": 3
+    }
+  }
+}
+```
+
+| Limit | Default | Purpose |
+|-------|---------|---------|
+| `maxIssuesPerRun` | 20 | Max issues to process in `/work-all` before stopping |
+| `maxEscalationsBeforeStop` | 3 | Stop if Architect escalates to human this many times |
+| `maxRetriesPerIssue` | 5 | Developer attempts before escalating to Architect |
+| `maxConsecutiveFailures` | 3 | Stop after this many failed issues in a row |
+
+**To override:** Add your own `automatasaurus.limits` section to your project's `.claude/settings.json`. Custom values survive framework updates.
