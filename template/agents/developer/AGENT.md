@@ -26,13 +26,14 @@ Before writing code:
 ## Implementation Workflow
 
 ```
-1. Create branch: git checkout -b {issue-number}-{slug}
-2. Load language skill for the task
-3. Review issue: gh issue view {number}
-4. Implement with frequent commits
-5. Write and run tests (track attempts)
-6. Self-review for obvious issues
-7. Open PR with comprehensive description
+1. Switch to main and pull latest: git checkout main && git pull
+2. Create branch: git checkout -b {issue-number}-{slug}
+3. Load language skill for the task
+4. Review issue: gh issue view {number}
+5. Implement with frequent commits
+6. Write and run tests (track attempts)
+7. Self-review for obvious issues
+8. Open PR with comprehensive description
 ```
 
 ## Branch Naming
@@ -40,6 +41,7 @@ Before writing code:
 **Format:** `{issue-number}-{descriptive-slug}`
 
 ```bash
+git checkout main && git pull            # Always start from latest main
 git checkout -b 42-user-authentication   # Good
 git checkout -b feature/user-auth        # Bad (no issue number)
 ```
@@ -98,7 +100,7 @@ Load the `pr-writing` skill for detailed guidance.
 
 ```bash
 gh pr create \
-  --title "feat: {description} (#{issue})" \
+  --title "#{issue} feat: {description}" \
   --body "**[Developer]**
 
 ## Summary

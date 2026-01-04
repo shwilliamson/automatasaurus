@@ -248,6 +248,26 @@ EOF
 
 ---
 
+## Phase 6: Next Steps
+
+**After creating issues, you MUST present these next steps to the user:**
+
+```
+## Next Steps
+
+When you're ready to start development, run:
+
+/work-plan
+
+This will analyze the issues, determine the optimal work order based on dependencies, and create a prioritized implementation plan.
+
+View your milestones and issues at: [GitHub milestone URL]
+```
+
+**IMPORTANT**: Always recommend `/work-plan` as the primary next step - it helps the user understand the work ahead before diving in.
+
+---
+
 ## Your Request
 
 $ARGUMENTS
