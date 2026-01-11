@@ -6,7 +6,7 @@ Autonomously work through all open GitHub issues using context-isolated subagent
 
 ```
 WORKFLOW_MODE: all-issues
-AUTO_MERGE: true (handled by this orchestrator (aka Product Owner) after /work completes)
+AUTO_MERGE: true (handled by this orchestrator (aka Product Owner) after work completes)
 ```
 
 ---
@@ -15,8 +15,8 @@ AUTO_MERGE: true (handled by this orchestrator (aka Product Owner) after /work c
 
 You are the **Autonomous Implementation Orchestrator**. You:
 1. Select issues based on dependencies and priority
-2. Spawn `/work {n}` as a subagent for each issue (context isolation)
-3. Parse subagent output to determine result
+2. Run the work playbook for each issue in isolation (new Codex tab/run)
+3. Parse output to determine result
 4. Merge successful PRs
 5. Enforce circuit breaker limits
 
@@ -27,13 +27,12 @@ You are the **Autonomous Implementation Orchestrator**. You:
 1. Load the `workflow-orchestration` skill
 2. Load the `github-workflow` skill
 3. Check for `implementation-plan.md` (if exists, follow it)
-4. Read circuit breaker limits from `.claude/settings.json` under `automatasaurus.limits`
 
 ---
 
 ## Circuit Breaker Limits
 
-Before each iteration, check limits from settings:
+Set limits up front (tune as needed for your repo):
 
 | Limit | Default | Action When Exceeded |
 |-------|---------|---------------------|
@@ -68,10 +67,10 @@ LOOP:
      - Otherwise use selection criteria (see below)
      - Check dependencies (skip if blocked)
 
-  4. SPAWN /work SUBAGENT
-     - Use Task tool to spawn: "Run /work {issue_number}"
-     - Wait for completion
-     - Parse output for result
+  4. RUN WORK PLAYBOOK IN ISOLATION
+     - Start a fresh Codex run (or new tab) using the work playbook for {issue_number}
+     - Keep context limited to that issue
+     - Wait for completion and capture the summary output
 
   5. PARSE RESULT
      - SUCCESS: Output contains "PR #X is ready" or "All required reviews complete"
@@ -113,50 +112,16 @@ If no `implementation-plan.md` exists, select issues by:
 
 ---
 
-## Spawning Work Subagent
+## Running Work in Isolation
 
-For each selected issue, spawn a subagent that loads and follows the `work-issue` skill.
-
-This ensures the subagent executes the **exact same logic** as the `/work` command.
-
-### Task Tool Parameters
-
-```
-subagent_type: "general-purpose"
-description: "Work on issue #{issue_number}"
-prompt: |
-  Work on GitHub issue #{issue_number}.
-
-  1. Load the `work-issue` skill from .claude/skills/work-issue/SKILL.md
-  2. Follow the skill workflow with ISSUE_NUMBER = {issue_number}
-  3. Execute all steps: dependencies, implementation, reviews
-  4. Report result using the skill's exit state format:
-     - SUCCESS: "PR #X is ready for merge"
-     - BLOCKED: "Issue #{issue_number} is blocked on #Y"
-     - ESCALATED: "Issue #{issue_number} requires human intervention"
-```
-
-### Example Invocation
-
-```
-Use the Task tool with subagent_type "general-purpose" to work on issue #42:
-
-"Work on GitHub issue #42.
-
-Load the work-issue skill from .claude/skills/work-issue/SKILL.md and follow
-the workflow with ISSUE_NUMBER = 42.
-
-Execute all steps: check dependencies, get design specs if UI, implement via
-developer agent, coordinate reviews (Architect, Tester, Designer if UI), handle
-any change requests.
-
-Report result clearly:
-- SUCCESS: 'PR #X is ready for merge'
-- BLOCKED: 'Issue #42 is blocked on #Y'
-- ESCALATED: 'Issue #42 requires human intervention'"
-```
-
-The subagent loads the same skill that `/work` uses, ensuring identical behavior with isolated context.
+For each issue:
+1. Open a new Codex run/tab so context stays small.
+2. Load the work playbook (`.codex/commands/work.md`) with `ISSUE_NUMBER = {issue_number}`.
+3. Follow the `work-issue` skill end-to-end (deps, implementation, reviews, tester).
+4. Report the result explicitly in the output:
+   - SUCCESS: `PR #X is ready for merge`
+   - BLOCKED: `Issue #{issue_number} is blocked on #Y`
+   - ESCALATED: `Issue #{issue_number} requires human intervention`
 
 ---
 
@@ -235,17 +200,17 @@ Stop the loop when ANY of these occur:
 
 **All complete:**
 ```bash
-.claude/hooks/request-attention.sh complete "All issues implemented and merged!"
+\.codex/hooks/request-attention.sh complete "All issues implemented and merged!"
 ```
 
 **Limit reached:**
 ```bash
-.claude/hooks/request-attention.sh info "Processed {n} issues. Run /work-all again to continue."
+\.codex/hooks/request-attention.sh info "Processed {n} issues. Run work-all again to continue."
 ```
 
 **Escalation/Failure limit:**
 ```bash
-.claude/hooks/request-attention.sh stuck "Stopped after {n} escalations. Human intervention needed."
+\.codex/hooks/request-attention.sh stuck "Stopped after {n} escalations. Human intervention needed."
 ```
 
 ---

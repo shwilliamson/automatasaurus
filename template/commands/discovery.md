@@ -36,7 +36,7 @@ Before starting, load:
 
 Read project documentation:
 - README.md or readme.md
-- CLAUDE.md (if present)
+- AGENTS.md (if present)
 
 Review:
 - What is this project?
@@ -297,16 +297,14 @@ EOF
 ```
 ## Next Steps
 
-When you're ready to start development, run:
-
-/work-plan
+When you're ready to start development, run the work-plan playbook.
 
 This will analyze the issues, determine the optimal work order based on dependencies, and create a prioritized implementation plan.
 
 View your milestones and issues at: [GitHub milestone URL]
 ```
 
-**IMPORTANT**: Always recommend `/work-plan` as the primary next step - it helps the user understand the work ahead before diving in.
+**IMPORTANT**: Always recommend the work-plan playbook as the primary next step - it helps the user understand the work ahead before diving in.
 
 ---
 

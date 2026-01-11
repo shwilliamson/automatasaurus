@@ -1,15 +1,15 @@
 #!/bin/bash
 # Automatasaurus Stop Hook
-# Called when Claude finishes a response
+# Optional helper you can call after a Codex run finishes
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NOTIFY="$SCRIPT_DIR/notify.sh"
 
-# Read the stop context from stdin (passed by Claude Code)
+# Read the stop context from stdin (provide the latest Codex output)
 CONTEXT=$(cat)
 
 # Check if this looks like a completion, handoff, question, or stuck state
-# The context contains Claude's last response
+# The context contains the last response
 # Order matters - check more specific patterns first
 
 # Handoff: subagent completed, passing to next agent (no notification - silent)

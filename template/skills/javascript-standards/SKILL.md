@@ -328,7 +328,7 @@ describe('UserCard', () => {
 
 ## Project Commands
 
-Check `.claude/commands.md` for project-specific commands. Common JS/TS commands:
+Check `\.codex/commands.md` for project-specific commands. Common JS/TS commands:
 
 ```bash
 # Dependencies

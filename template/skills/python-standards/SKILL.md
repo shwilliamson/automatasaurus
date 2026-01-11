@@ -216,7 +216,7 @@ def test_uppercase(input, expected):
 
 ## Project Commands
 
-Check `.claude/commands.md` for project-specific commands. Common Python commands:
+Check `\.codex/commands.md` for project-specific commands. Common Python commands:
 
 ```bash
 # Virtual environment

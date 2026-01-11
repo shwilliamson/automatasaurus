@@ -10,7 +10,7 @@ Automatasaurus includes a notification system to alert the user when their atten
 ## Automatic Notifications
 
 The system automatically sends notifications on stop based on context:
-- **Questions**: When Claude asks a question and waits for input
+- **Questions**: When an agent asks a question and waits for input
 - **Approvals**: When approval is needed to proceed
 - **Stuck**: When an agent encounters an issue
 - **Complete**: When all work is done
@@ -20,7 +20,7 @@ The system automatically sends notifications on stop based on context:
 When you need to explicitly alert the user, use:
 
 ```bash
-.claude/hooks/request-attention.sh <type> "<message>"
+\.codex/hooks/request-attention.sh <type> "<message>"
 ```
 
 ### Notification Types
@@ -38,19 +38,19 @@ When you need to explicitly alert the user, use:
 
 ```bash
 # Question needs answering
-.claude/hooks/request-attention.sh question "Should I use PostgreSQL or MySQL for this project?"
+\.codex/hooks/request-attention.sh question "Should I use PostgreSQL or MySQL for this project?"
 
 # Approval needed
-.claude/hooks/request-attention.sh approval "PR #42 is ready for review"
+\.codex/hooks/request-attention.sh approval "PR #42 is ready for review"
 
 # Got stuck
-.claude/hooks/request-attention.sh stuck "Cannot access the GitHub API - authentication failed"
+\.codex/hooks/request-attention.sh stuck "Cannot access the GitHub API - authentication failed"
 
 # Work complete
-.claude/hooks/request-attention.sh complete "All 5 user stories have been implemented and tested"
+\.codex/hooks/request-attention.sh complete "All 5 user stories have been implemented and tested"
 
 # Error occurred
-.claude/hooks/request-attention.sh error "Build failed with 3 errors"
+\.codex/hooks/request-attention.sh error "Build failed with 3 errors"
 ```
 
 ## When to Notify

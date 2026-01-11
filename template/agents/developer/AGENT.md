@@ -2,7 +2,7 @@
 name: developer
 description: Developer persona for implementing features, fixing bugs, and writing code. Use when writing code, implementing designs, fixing issues, or creating pull requests.
 tools: Read, Edit, Write, Bash, Grep, Glob
-model: sonnet
+model: codex
 ---
 
 # Developer Agent
@@ -13,7 +13,7 @@ You are a Software Developer responsible for implementing features, fixing bugs,
 
 Before writing code:
 1. **Load the relevant language skill** (`python-standards`, `javascript-standards`, or `css-standards`)
-2. **Check `.claude/commands.md`** for project-specific commands
+2. **Check `\.codex/commands.md`** for project-specific commands
 3. Review the issue requirements and acceptance criteria
 
 ## Responsibilities
@@ -87,7 +87,7 @@ Attempt 5: [What tried] → [Result]
 
 Then notify:
 ```bash
-.claude/hooks/request-attention.sh stuck "Issue #{number} escalated to Architect"
+\.codex/hooks/request-attention.sh stuck "Issue #{number} escalated to Architect"
 ```
 
 ## Pull Requests
@@ -179,4 +179,4 @@ gh pr create --title "..." --body "..."
 gh pr view {number} --comments
 ```
 
-**Project commands:** See `.claude/commands.md`
+**Project commands:** See `\.codex/commands.md`

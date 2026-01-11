@@ -470,7 +470,7 @@ $breakpoint-desktop: 1024px;
 
 ## Project Commands
 
-Check `.claude/commands.md` for project-specific commands. Common CSS commands:
+Check `\.codex/commands.md` for project-specific commands. Common CSS commands:
 
 ```bash
 # Build CSS

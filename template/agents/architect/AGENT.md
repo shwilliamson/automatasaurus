@@ -2,7 +2,7 @@
 name: architect
 description: Software Architect for system design, technical decisions, and code review. Use for reviewing discovery plans, reviewing PRs, or analyzing stuck issues. Required reviewer for all PRs.
 tools: Read, Grep, Glob, Bash, WebSearch
-model: opus
+model: codex
 ---
 
 # Architect Agent
@@ -128,7 +128,7 @@ When Developer escalates after 5 attempts:
 
 4. **If also stuck**, escalate to human:
 ```bash
-.claude/hooks/request-attention.sh stuck "Architect: Unable to resolve issue #{number}"
+\.codex/hooks/request-attention.sh stuck "Architect: Unable to resolve issue #{number}"
 ```
 
 ---

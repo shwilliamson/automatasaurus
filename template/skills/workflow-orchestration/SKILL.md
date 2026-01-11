@@ -9,16 +9,16 @@ This skill defines how the Automatasaurus workflow operates.
 
 ## Architecture Overview
 
-### Slash Commands (Orchestration)
+### Playbooks (Orchestration)
 
-Commands run in the main conversation and orchestrate agents:
+Playbooks run in the main conversation and orchestrate agents:
 
 | Command | Purpose | Produces |
 |---------|---------|----------|
-| `/discovery` | Requirements gathering | `discovery.md`, issues |
-| `/work-plan` | Implementation planning | `implementation-plan.md` |
-| `/work {n}` | Single issue | PR (user merges) |
-| `/work-all` | All issues | PRs merged, issues closed |
+| `discovery` | Requirements gathering | `discovery.md`, issues |
+| `work-plan` | Implementation planning | `implementation-plan.md` |
+| `work {n}` | Single issue | PR (user merges) |
+| `work-all` | All issues | PRs merged, issues closed |
 
 ### Agents (Autonomous Workers)
 
@@ -37,12 +37,12 @@ Agents perform discrete tasks without user dialogue:
 
 The system operates in different modes:
 
-| Mode | Command | Merge Behavior |
+| Mode | Trigger | Merge Behavior |
 |------|---------|----------------|
-| `discovery` | `/discovery` | N/A - creates issues |
-| `planning` | `/work-plan` | N/A - creates plan |
-| `single-issue` | `/work {n}` | **Notify only** - user merges |
-| `all-issues` | `/work-all` | **Auto-merge** and continue |
+| `discovery` | `discovery` playbook | N/A - creates issues |
+| `planning` | `work-plan` playbook | N/A - creates plan |
+| `single-issue` | `work {n}` playbook | **Notify only** - user merges |
+| `all-issues` | `work-all` playbook | **Auto-merge** and continue |
 
 ### Mode Context Passing
 
@@ -65,7 +65,7 @@ When delegating to agents, include mode context:
 ### Phase 1: Discovery (Interactive)
 
 ```
-User: /discovery "feature description"
+User: discovery playbook "feature description"
            ↓
     Main conversation facilitates requirements gathering
     (loads requirements-gathering, user-stories skills)
@@ -81,11 +81,11 @@ User: /discovery "feature description"
 ### Phase 2: Implementation (Autonomous)
 
 ```
-User: /work-plan (optional)
+User: work-plan playbook (optional)
            ↓
     Analyzes issues, creates implementation-plan.md
            ↓
-User: /work-all
+User: work-all playbook
            ↓
     LOOP for each issue:
       - Check dependencies
@@ -104,7 +104,7 @@ User: /work-all
 
 ## PR Done Criteria
 
-Both `/work` and `/work-all` use these criteria to determine when a PR is ready:
+Both the work and work-all playbooks use these criteria to determine when a PR is ready:
 
 ### Required Approvals
 
@@ -230,7 +230,7 @@ Error: [description]
 
 If Architect also stuck:
 ```bash
-.claude/hooks/request-attention.sh stuck "Unable to resolve issue #{number}"
+\.codex/hooks/request-attention.sh stuck "Unable to resolve issue #{number}"
 ```
 
 Mark issue as blocked, continue to next issue.
@@ -244,7 +244,7 @@ The workflow produces these artifacts:
 | File | Command | Purpose |
 |------|---------|---------|
 | `discovery.md` | `/discovery` | Requirements, flows, architecture |
-| `implementation-plan.md` | `/work-plan` | Sequenced work order |
+| `implementation-plan.md` | `work-plan` | Sequenced work order |
 
 ---
 

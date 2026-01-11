@@ -162,5 +162,5 @@ Developer stuck (5 attempts)
 Architect analyzes
     ↓
 If still stuck → Human escalation
-    .claude/hooks/request-attention.sh stuck "..."
+    \.codex/hooks/request-attention.sh stuck "..."
 ```

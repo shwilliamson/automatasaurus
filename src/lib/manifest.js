@@ -7,7 +7,7 @@ const MANIFEST_FILE = '.automatasaurus.manifest.json';
  * Get the manifest file path for a project
  */
 export function getManifestPath(projectRoot) {
-  return join(projectRoot, '.claude', MANIFEST_FILE);
+  return join(projectRoot, '.codex', MANIFEST_FILE);
 }
 
 /**

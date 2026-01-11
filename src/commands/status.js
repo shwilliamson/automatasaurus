@@ -39,7 +39,7 @@ Merged blocks:   ${manifest.merged_blocks.length}
   let brokenCount = 0;
 
   for (const symlinkPath of manifest.symlinks.slice(0, 10)) {
-    const fullPath = join(paths.claude, symlinkPath);
+    const fullPath = join(paths.codex, symlinkPath);
     const linked = await isSymlink(fullPath);
     const status = linked ? 'OK' : 'BROKEN';
     if (!linked) brokenCount++;

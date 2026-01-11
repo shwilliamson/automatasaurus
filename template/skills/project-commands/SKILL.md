@@ -9,11 +9,11 @@ This skill helps agents find and use the correct commands for the current projec
 
 ## Finding Commands
 
-All project-specific commands are defined in `.claude/commands.md`. Always read this file before running commands.
+All project-specific commands are defined in `\.codex/commands.md`. Always read this file before running commands.
 
 ```bash
 # Read the commands file
-cat .claude/commands.md
+cat \.codex/commands.md
 ```
 
 ## Command Categories
@@ -38,7 +38,7 @@ cat .claude/commands.md
 
 1. Copy the template:
 ```bash
-cp .claude/commands.template.md [target-project]/.claude/commands.md
+cp \.codex/commands.template.md [target-project]/\.codex/commands.md
 ```
 
 2. Replace placeholders with actual commands:
@@ -89,12 +89,12 @@ cp .claude/commands.template.md [target-project]/.claude/commands.md
 
 When an agent needs to run a command:
 
-1. Check `.claude/commands.md` for the correct command
+1. Check `\.codex/commands.md` for the correct command
 2. Use the command exactly as specified
 3. If a command is missing, ask the user or check `package.json`/equivalent
 
 ## Updating Commands
 
 If you discover the correct command for an action:
-1. Update `.claude/commands.md` with the correct command
+1. Update `\.codex/commands.md` with the correct command
 2. Ensure other agents can find it in the future

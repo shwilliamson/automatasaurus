@@ -1,13 +1,13 @@
 ---
 name: work-issue
-description: Core implementation logic for working on a single GitHub issue. Used by both /work command and /work-all subagents to ensure consistent behavior.
+description: Core implementation logic for working on a single GitHub issue. Used by the work playbook and the work-all orchestrator to ensure consistent behavior.
 ---
 
 # Work Issue Skill
 
 This skill contains the implementation logic for working on a single GitHub issue. It is loaded by:
-- `/work {n}` command (direct invocation)
-- `/work-all` subagents (spawned for context isolation)
+- `work {n}` playbook (direct invocation)
+- `work-all` orchestrator (spawned for context isolation)
 
 ## Input
 
@@ -70,12 +70,12 @@ Check if issue involves UI (labels contain "ui", "frontend", or issue mentions U
 If UI work needed and no design specs in comments, spawn the designer agent:
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Designer specs for issue #{ISSUE_NUMBER}"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
+    You are the Designer agent. Load your role from \.codex/agents/designer/AGENT.md
 
     **[Designer]**
 
@@ -98,12 +98,12 @@ gh issue edit {ISSUE_NUMBER} --add-label "in-progress" --remove-label "ready"
 Spawn the developer agent:
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Implement issue #{ISSUE_NUMBER}"
   prompt: |
-    You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
+    You are the Developer agent. Load your role from \.codex/agents/developer/AGENT.md
 
     **[Developer]**
 
@@ -137,12 +137,12 @@ gh issue edit {ISSUE_NUMBER} --add-label "needs-review" --remove-label "in-progr
 ### Architect Review (Required)
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Architect review PR #{pr_number}"
   prompt: |
-    You are the Architect agent. Load your role from .claude/agents/architect/AGENT.md
+    You are the Architect agent. Load your role from \.codex/agents/architect/AGENT.md
 
     **[Architect]**
 
@@ -158,12 +158,12 @@ Use the Task tool with:
 ### Designer Review (If UI Changes)
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Designer review PR #{pr_number}"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
+    You are the Designer agent. Load your role from \.codex/agents/designer/AGENT.md
 
     **[Designer]**
 
@@ -180,12 +180,12 @@ Use the Task tool with:
 ### Tester Review (Required)
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Tester verify PR #{pr_number}"
   prompt: |
-    You are the Tester agent. Load your role from .claude/agents/tester/AGENT.md
+    You are the Tester agent. Load your role from \.codex/agents/tester/AGENT.md
 
     **[Tester]**
 
@@ -211,12 +211,12 @@ gh pr view {pr_number} --comments
 **If any `❌ CHANGES REQUESTED`:**
 
 ```
-Use the Task tool with:
+Start a new Codex run with:
   subagent_type: "general-purpose"
-  model: "sonnet"
+  model: "codex"
   description: "Address feedback PR #{pr_number}"
   prompt: |
-    You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
+    You are the Developer agent. Load your role from \.codex/agents/developer/AGENT.md
 
     **[Developer]**
 
@@ -286,7 +286,7 @@ Include:
 
 ## Exit States
 
-The caller (either /work command or /work-all orchestrator) will parse the output for these indicators:
+The caller (either the work playbook or work-all orchestrator) will parse the output for these indicators:
 
 | State | Output Contains | Meaning |
 |-------|-----------------|---------|

@@ -33,12 +33,12 @@ export async function getVersion() {
 export function getProjectPaths(projectRoot) {
   return {
     automatasaurus: join(projectRoot, '.automatasaurus'),
-    claude: join(projectRoot, '.claude'),
-    claudeMd: join(projectRoot, 'CLAUDE.md'),
-    manifest: join(projectRoot, '.claude', '.automatasaurus.manifest.json'),
-    settings: join(projectRoot, '.claude', 'settings.json'),
-    settingsLocal: join(projectRoot, '.claude', 'settings.local.json'),
-    commands: join(projectRoot, '.claude', 'commands.md'),
+    codex: join(projectRoot, '.codex'),
+    agentsMd: join(projectRoot, 'AGENTS.md'),
+    manifest: join(projectRoot, '.codex', '.automatasaurus.manifest.json'),
+    settings: join(projectRoot, '.codex', 'settings.json'),
+    settingsLocal: join(projectRoot, '.codex', 'settings.local.json'),
+    commands: join(projectRoot, '.codex', 'commands.md'),
   };
 }
 

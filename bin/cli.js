@@ -6,7 +6,7 @@ import { update } from '../src/commands/update.js';
 import { status } from '../src/commands/status.js';
 
 const helpText = `
-automatasaurus - Claude Code automation framework
+automatasaurus - Codex automation framework
 
 Usage:
   automatasaurus <command> [options]

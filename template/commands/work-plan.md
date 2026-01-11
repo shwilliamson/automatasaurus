@@ -57,12 +57,10 @@ Build a dependency graph:
 Before implementation begins, spawn the Designer agent to establish the visual foundation:
 
 ```
-Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+Start a new Codex run with:
   description: "Create design language"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
+    You are the Designer agent. Load your role from \.codex/agents/designer/AGENT.md
 
     **[Designer]**
 
@@ -237,7 +235,7 @@ I've analyzed [N] open issues and created an implementation plan.
 
 The full plan is in `implementation-plan.md`.
 
-Ready to start with `/work-all`?
+Ready to start with the work-all playbook?
 ```
 
 ---

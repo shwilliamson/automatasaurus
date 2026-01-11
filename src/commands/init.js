@@ -3,8 +3,7 @@ import { join } from 'node:path';
 import { getTemplateDir, getProjectPaths, getVersion, SUBDIR_SYMLINK_DIRS, FILE_SYMLINK_DIRS } from '../lib/paths.js';
 import { symlinkDirectory, symlinkSubdirectories } from '../lib/symlinks.js';
 import { mergeBlockIntoFile } from '../lib/block-merge.js';
-import { mergeLayeredSettings, createLocalSettingsTemplate } from '../lib/json-merge.js';
-import { readManifest, writeManifest, createManifest, updateManifest } from '../lib/manifest.js';
+import { readManifest, writeManifest, createManifest } from '../lib/manifest.js';
 
 export async function init({ force = false } = {}) {
   const projectRoot = process.cwd();
@@ -39,17 +38,17 @@ export async function init({ force = false } = {}) {
     }
   }
 
-  // 2. Create .claude directory
-  await mkdir(paths.claude, { recursive: true });
+  // 2. Create .codex directory
+  await mkdir(paths.codex, { recursive: true });
 
-  // 3. Create symlinks from .claude to .automatasaurus
-  console.log('\nCreating symlinks in .claude/...');
+  // 3. Create symlinks from .codex to .automatasaurus
+  console.log('\nCreating symlinks in .codex/...');
   const allSymlinks = [];
 
   // Subdirectory-level symlinks (agents, skills)
   for (const dir of SUBDIR_SYMLINK_DIRS) {
     const sourceDir = join(paths.automatasaurus, dir);
-    const targetDir = join(paths.claude, dir);
+    const targetDir = join(paths.codex, dir);
     try {
       const created = await symlinkSubdirectories(sourceDir, targetDir);
       for (const subdir of created) {
@@ -65,7 +64,7 @@ export async function init({ force = false } = {}) {
   // File-level symlinks (hooks, commands)
   for (const dir of FILE_SYMLINK_DIRS) {
     const sourceDir = join(paths.automatasaurus, dir);
-    const targetDir = join(paths.claude, dir);
+    const targetDir = join(paths.codex, dir);
     try {
       const created = await symlinkDirectory(sourceDir, targetDir);
       for (const file of created) {
@@ -78,43 +77,19 @@ export async function init({ force = false } = {}) {
     }
   }
 
-  // 4. Block-merge CLAUDE.md
-  console.log('\nMerging CLAUDE.md...');
-  const claudeMdTemplate = join(templateDir, 'CLAUDE.block.md');
+  // 4. Block-merge AGENTS.md
+  console.log('\nMerging AGENTS.md...');
+  const agentsTemplate = join(templateDir, 'AGENTS.block.md');
   try {
-    const blockContent = await readFile(claudeMdTemplate, 'utf-8');
-    const result = await mergeBlockIntoFile(paths.claudeMd, 'CORE', blockContent);
-    console.log(`  ${result.created ? 'Created' : 'Updated'} CLAUDE.md`);
+    const blockContent = await readFile(agentsTemplate, 'utf-8');
+    const result = await mergeBlockIntoFile(paths.agentsMd, 'CORE', blockContent);
+    console.log(`  ${result.created ? 'Created' : 'Updated'} AGENTS.md`);
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
-    console.log('  No CLAUDE.md template found, skipping');
+    console.log('  No AGENTS.md template found, skipping');
   }
 
-  // 5. Merge settings.json with layered config support
-  console.log('\nMerging settings...');
-  const settingsTemplate = join(templateDir, 'settings.json');
-  try {
-    const settingsContent = await readFile(settingsTemplate, 'utf-8');
-    const frameworkSettings = JSON.parse(settingsContent);
-
-    // Create settings.local.json template if it doesn't exist
-    const localCreated = await createLocalSettingsTemplate(paths.settingsLocal);
-    if (localCreated) {
-      console.log('  Created settings.local.json (for your customizations)');
-    }
-
-    // Merge: framework defaults + user overrides -> settings.json
-    const result = await mergeLayeredSettings(paths.settings, paths.settingsLocal, frameworkSettings);
-    console.log(`  ${result.created ? 'Created' : 'Updated'} settings.json`);
-    if (result.hasLocalOverrides) {
-      console.log('  Applied overrides from settings.local.json');
-    }
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-    console.log('  No settings template found, skipping');
-  }
-
-  // 6. Block-merge commands.md
+  // 5. Block-merge commands.md
   console.log('\nMerging commands.md...');
   const commandsTemplate = join(templateDir, 'commands.block.md');
   try {
@@ -126,12 +101,12 @@ export async function init({ force = false } = {}) {
     console.log('  No commands.md template found, skipping');
   }
 
-  // 7. Write manifest
+  // 6. Write manifest
   const manifest = createManifest(version);
   manifest.symlinks = allSymlinks;
   manifest.merged_blocks = [
-    { file: 'CLAUDE.md', block: 'CORE' },
-    { file: '.claude/commands.md', block: 'COMMANDS' },
+    { file: 'AGENTS.md', block: 'CORE' },
+    { file: '.codex/commands.md', block: 'COMMANDS' },
   ];
   await writeManifest(projectRoot, manifest);
   console.log('\nWrote manifest file.');
@@ -140,9 +115,9 @@ export async function init({ force = false } = {}) {
 Automatasaurus initialized successfully!
 
 Next steps:
-  1. Review CLAUDE.md for framework documentation
-  2. Update .claude/commands.md with your project-specific commands
-  3. Start using /discovery, /work, or /work-all commands
+  1. Review AGENTS.md for framework documentation
+  2. Update .codex/commands.md with your project-specific commands
+  3. Run playbooks (discovery, work, work-all) from Codex using the provided prompts
 
 Run "automatasaurus status" to see installation details.
 `);

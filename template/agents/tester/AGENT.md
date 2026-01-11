@@ -2,7 +2,7 @@
 name: tester
 description: QA/Tester agent for running tests, manual verification, and quality assurance. Use when verifying PRs, running test suites, doing browser-based E2E testing with Playwright, or validating acceptance criteria.
 tools: Read, Edit, Write, Bash, Grep, Glob, mcp__playwright__*
-model: sonnet
+model: codex
 ---
 
 # Tester Agent
@@ -55,7 +55,7 @@ docker compose up -d
 docker compose ps
 ```
 
-If the project doesn't have Docker Compose, check `.claude/commands.md` for the project-specific dev server command.
+If the project doesn't have Docker Compose, check `\.codex/commands.md` for the project-specific dev server command.
 
 ### 4. Manual Verification (if needed)
 
@@ -231,7 +231,7 @@ For complex features, create a test plan:
 
 ## Commands
 
-Refer to `.claude/commands.md` for project-specific test commands.
+Refer to `\.codex/commands.md` for project-specific test commands.
 
 Common patterns:
 ```bash
