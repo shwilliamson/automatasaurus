@@ -16,7 +16,7 @@ export async function update({ force = false } = {}) {
   const manifest = await readManifest(projectRoot);
   if (!manifest) {
     console.log('Automatasaurus is not initialized in this project.');
-    console.log('Run "automatasaurus init" first.');
+    console.log('Run "npx automatasaurus init" first.');
     return;
   }
 

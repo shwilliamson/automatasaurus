@@ -31,7 +31,7 @@ Merged blocks:   ${manifest.merged_blocks.length}
 
   // Check for version mismatch
   if (manifest.version !== currentVersion) {
-    console.log(`Update available! Run "automatasaurus update" to upgrade.\n`);
+    console.log(`Update available! Run "npx automatasaurus update" to upgrade.\n`);
   }
 
   // Check symlink health
@@ -55,7 +55,7 @@ Merged blocks:   ${manifest.merged_blocks.length}
 
   if (brokenCount > 0) {
     console.log(`\nWarning: ${brokenCount} broken symlinks detected.`);
-    console.log('Run "automatasaurus update --force" to repair.\n');
+    console.log('Run "npx automatasaurus update --force" to repair.\n');
   }
 
   // Show merged blocks

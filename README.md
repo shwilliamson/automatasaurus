@@ -246,6 +246,7 @@ your-project/
 │       ├── discovery.md
 │       ├── work.md
 │       ├── work-all.md
+│       ├── work-milestone.md
 │       └── work-plan.md
 └── .claude/
     ├── settings.json            # Claude Code settings (automatasaurus hooks merged in)
@@ -345,6 +346,7 @@ The primary way to invoke workflows:
 | `/work-plan` | Analyze open issues, create sequenced implementation plan |
 | `/contextualize` | Generate agent-specific PROJECT.md context files |
 | `/work-all` | Work through all open issues autonomously |
+| `/work-milestone [milestone#]` | Work through all issues in a specific milestone |
 | `/work [issue#]` | Work on a specific issue |
 
 ### `/discovery` - Discovery Mode
@@ -407,6 +409,24 @@ The orchestrator (aka Product Owner) will:
 - `maxIssuesPerRun`: 20 - Stop after this many issues
 - `maxEscalationsBeforeStop`: 3 - Stop if stuck too many times
 - `maxConsecutiveFailures`: 3 - Stop if failing repeatedly
+
+### `/work-milestone` - Milestone-Scoped Work
+
+```
+/work-milestone 3
+```
+
+Work through all open issues in a specific GitHub milestone:
+- Validates the milestone exists and reports its title/open issue count
+- Lists only issues assigned to that milestone
+- Follows `implementation-plan.md` if it exists (filtered to milestone issues)
+- Otherwise uses dependency/priority ordering within the milestone
+- Same circuit breaker limits as `/work-all`
+- Auto-merges successful PRs
+- Reports milestone-specific progress
+- Stops when all issues in the milestone are complete (or limits reached)
+
+Useful when you want to focus on completing a specific release or feature set rather than all open issues.
 
 ### `/work` - Single Issue
 
