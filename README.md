@@ -84,27 +84,32 @@ User: /work-all
 │    - Consider priority labels                                       │
 │    - Check circuit breaker limits                                  │
 │                                                                     │
-│ 2. Spawn /work {n} as subagent (context isolation)                 │
+│ 2. Setup orchestration folder                                       │
+│    - Create orchestration/issues/{issue-num}-{slug}/               │
+│    - All agent briefings and reports stored here                   │
+│                                                                     │
+│ 3. Spawn agents with briefings                                      │
 │    └→ Designer: Add specs if UI work needed                        │
+│       (reads BRIEFING-design-specs.md, writes REPORT)              │
 │                                                                     │
-│ 3. Developer: Implement                                             │
+│ 4. Developer: Implement                                             │
+│    - Reads BRIEFING-implement.md (includes prior agent activity)   │
 │    - Create branch: {issue-num}-{slug}                             │
-│    - Commit frequently at logical checkpoints                      │
 │    - If stuck (5 attempts) → Escalate to Architect                 │
-│    - If Architect stuck → Notify human, wait                       │
 │    - Open PR with "Closes #X"                                      │
+│    - Writes REPORT-implement.md                                    │
 │                                                                     │
-│ 4. Review Cycle                                                     │
-│    ├→ Architect: REQUIRED review                                   │
-│    ├→ Designer: Review if UI-relevant (can decline "N/A")          │
+│ 5. Review Cycle (parallel)                                          │
+│    ├→ Architect: REQUIRED review (reads/writes briefing/report)    │
+│    ├→ Designer: Review if UI-relevant                              │
 │    └→ Developer: Address feedback, push fixes                      │
 │                                                                     │
-│ 5. Tester: Verification                                             │
+│ 6. Tester: Verification                                             │
+│    - Reads BRIEFING-test.md (includes all prior reports)           │
 │    - Run automated tests                                            │
-│    - Manual verification if needed (Playwright)                    │
-│    - If issues → Back to Developer                                 │
+│    - Writes REPORT-test.md                                         │
 │                                                                     │
-│ 6. Merge and continue                                               │
+│ 7. Merge and continue                                               │
 │    - Product Owner merges PR                                       │
 │    - Loop until complete or limits reached                         │
 └─────────────────────────────────────────────────────────────────────┘
@@ -137,6 +142,7 @@ All agents prefix their comments with their identity:
 
 ## Features
 
+- **Bidirectional Context Flow**: Agents communicate through briefings and reports, creating an audit trail
 - **Stop Hooks**: Intelligent evaluation ensures tasks are complete before stopping
 - **Subagent Coordination**: Specialized agents with role-specific completion criteria
 - **GitHub Integration**: All work coordinated through issues, PRs, and labels
@@ -146,6 +152,45 @@ All agents prefix their comments with their identity:
 - **Language Skills**: On-demand coding standards for Python, JavaScript, CSS
 - **Project Commands**: Configurable commands for any project stack
 - **Extended Sessions**: Designed for autonomous work over extended periods
+
+## Agent Context Flow
+
+Sub-agents start with fresh context (no conversation history). The orchestration layer uses **briefings** and **reports** to communicate context and capture results.
+
+### How It Works
+
+1. **Parent creates briefing** with task context, constraints, and prior agent activity
+2. **Sub-agent reads briefing** as its first action
+3. **Sub-agent does work** following the briefing instructions
+4. **Sub-agent writes report** before completing (what was done, decisions made, issues encountered)
+5. **Parent reads report** and includes summary in next agent's briefing
+
+This creates a **context chain** where each agent knows what previous agents did.
+
+### Orchestration Folder Structure
+
+All briefings and reports are stored per-issue:
+
+```
+orchestration/
+└── issues/
+    └── 42-user-authentication/
+        ├── BRIEFING-design-specs.md      # Context for Designer
+        ├── REPORT-design-specs.md        # Designer's output
+        ├── BRIEFING-implement.md         # Context for Developer
+        ├── REPORT-implement.md           # Developer's output
+        ├── BRIEFING-architect-review.md  # Context for Architect
+        ├── REPORT-architect-review.md    # Architect's findings
+        ├── BRIEFING-test.md              # Context for Tester
+        └── REPORT-test.md                # Tester's results
+```
+
+### Benefits
+
+- **Audit trail**: Full history of agent communication per issue
+- **Debugging**: Can review what context each agent received
+- **No collisions**: Each agent spawn gets unique files
+- **Informed decisions**: Reviewers see what Developer did, Tester sees all prior activity
 
 ## Prerequisites
 
@@ -172,6 +217,11 @@ After running `npx automatasaurus init`, your project will have:
 ```
 your-project/
 ├── CLAUDE.md                    # Project context (automatasaurus block merged in)
+├── orchestration/               # Agent communication (created during /work)
+│   └── issues/                  # Per-issue briefings and reports
+│       └── 42-user-auth/
+│           ├── BRIEFING-*.md    # Context files for each agent
+│           └── REPORT-*.md      # Output files from each agent
 ├── .automatasaurus/             # Framework files (managed by installer)
 │   ├── README.md                # Framework documentation
 │   ├── agents/                  # AI agents
@@ -182,10 +232,10 @@ your-project/
 │   │   └── tester/              # QA, Playwright, merge authority
 │   ├── skills/                  # Knowledge modules
 │   │   ├── workflow-orchestration/
+│   │   ├── agent-coordination/
+│   │   ├── work-issue/
 │   │   ├── github-workflow/
-│   │   ├── github-issues/
 │   │   ├── python-standards/
-│   │   ├── javascript-standards/
 │   │   ⋮                        # (additional skills)
 │   ├── hooks/                   # Shell scripts for notifications
 │   │   ├── notify.sh
@@ -206,7 +256,7 @@ your-project/
     └── commands/ → .automatasaurus/commands/
 ```
 
-**Note:** Files in `.automatasaurus/` are managed by the installer and updated via `npx automatasaurus update`. Add your own custom agents/skills directly to `.claude/` (not as symlinks).
+**Note:** Files in `.automatasaurus/` are managed by the installer and updated via `npx automatasaurus update`. Add your own custom agents/skills directly to `.claude/` (not as symlinks). The `orchestration/` folder is created during `/work` commands and can optionally be added to `.gitignore`.
 
 ## Installation
 

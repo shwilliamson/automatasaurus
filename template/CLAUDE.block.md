@@ -241,6 +241,47 @@ Use the tester agent with playwright to verify the login flow
 
 Or they are automatically selected based on task context.
 
+## Agent Context Flow
+
+Sub-agents start with fresh context - they don't inherit the parent conversation's history. The orchestration layer uses **briefings** and **reports** to communicate context and capture results.
+
+### How It Works
+
+When the `/work` or `/work-all` commands spawn agents, they:
+
+1. **Create a briefing file** with task context and prior agent activity
+2. **Pass the briefing path** in the Task prompt
+3. **Read the agent's report** after the Task returns
+4. **Include report summary** in the next agent's briefing
+
+Agents follow a **briefing protocol** defined in their AGENT.md files:
+1. Read the briefing file first
+2. Do their work
+3. Write a report before completing
+
+### Orchestration Folder Structure
+
+All briefings and reports are stored in `orchestration/`:
+
+```
+orchestration/
+├── discovery/
+│   └── {date}-{feature}/
+├── planning/
+│   └── {date}-{plan}/
+└── issues/
+    └── {issue-number}-{slug}/
+        ├── BRIEFING-design-specs.md
+        ├── REPORT-design-specs.md
+        ├── BRIEFING-implement.md
+        ├── REPORT-implement.md
+        ├── BRIEFING-architect-review.md
+        ├── REPORT-architect-review.md
+        └── ...
+```
+
+This provides a full audit trail of agent communication for each issue.
+
 ## GitHub Integration
 
 This project uses the `gh` CLI for GitHub operations. Ensure you are authenticated:
@@ -259,7 +300,7 @@ Available skills in `.claude/skills/`:
 - `github-issues` - Issue creation, sizing, milestones
 - `pr-writing` - Best practices for writing clear PR descriptions
 - `code-review` - Best practices for performing thorough code reviews
-- `agent-coordination` - Multi-agent workflow patterns
+- `agent-coordination` - Multi-agent workflow patterns and briefing/report protocol
 - `project-commands` - Finding and using project-specific commands
 - `notifications` - User notification system for questions, approvals, and alerts
 

@@ -16,18 +16,36 @@ This skill expects an `ISSUE_NUMBER` to be provided by the caller.
 ## Workflow
 
 ```
-1. GET ISSUE DETAILS
-2. CHECK DEPENDENCIES → If blocked, report and stop
-3. GET DESIGN SPECS (if UI) → Invoke designer agent
-4. IMPLEMENT → Invoke developer agent
-5. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
-6. HANDLE CHANGE REQUESTS → Loop until all approved
-7. REPORT RESULT → Success, Blocked, or Escalated
+1. SETUP ORCHESTRATION FOLDER
+2. GET ISSUE DETAILS
+3. CHECK DEPENDENCIES → If blocked, report and stop
+4. GET DESIGN SPECS (if UI) → Invoke designer agent with briefing
+5. IMPLEMENT → Invoke developer agent with briefing
+6. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
+7. HANDLE CHANGE REQUESTS → Loop until all approved
+8. REPORT RESULT → Success, Blocked, or Escalated
 ```
 
 ---
 
-## Step 1: Get Issue Details
+## Step 1: Setup Orchestration Folder
+
+Create a folder for this issue's briefings and reports:
+
+```bash
+# Get issue title for slug
+ISSUE_TITLE=$(gh issue view {ISSUE_NUMBER} --json title --jq '.title')
+SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-' | head -c 30)
+
+# Create orchestration folder
+mkdir -p orchestration/issues/{ISSUE_NUMBER}-${SLUG}
+```
+
+All briefings and reports for this issue will go in this folder.
+
+---
+
+## Step 2: Get Issue Details
 
 ```bash
 gh issue view {ISSUE_NUMBER}
@@ -41,7 +59,7 @@ Extract:
 
 ---
 
-## Step 2: Check Dependencies
+## Step 3: Check Dependencies
 
 Parse "Depends on #X" from issue body:
 
@@ -63,11 +81,43 @@ Stop here.
 
 ---
 
-## Step 3: Get Design Specs (If UI Work)
+## Step 4: Get Design Specs (If UI Work)
 
 Check if issue involves UI (labels contain "ui", "frontend", or issue mentions UI work).
 
-If UI work needed and no design specs in comments, spawn the designer agent:
+If UI work needed and no design specs in comments:
+
+### 4a. Write Designer Briefing
+
+Write `orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md`:
+
+```markdown
+# Agent Briefing: design-specs
+Generated: {timestamp}
+
+## Your Task
+Add UI/UX specifications to issue #{ISSUE_NUMBER}.
+
+## Context
+- Issue: #{ISSUE_NUMBER} - {title}
+- This issue involves UI work and needs design specifications before implementation
+
+## Resources (Read as Needed)
+- Issue details: `gh issue view {ISSUE_NUMBER}`
+- design-system.md: Available design tokens and patterns
+- Existing components in codebase for consistency
+
+## Expected Output
+Post design specifications as an issue comment following your AGENT.md template, including:
+- Design intent
+- User flow
+- Visual design with token references
+- Component states
+- Accessibility requirements
+- Responsive behavior
+```
+
+### 4b. Spawn Designer Agent
 
 ```
 Use the Task tool with:
@@ -77,25 +127,57 @@ Use the Task tool with:
   prompt: |
     You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
 
-    **[Designer]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md first.
 
-    Add UI/UX specifications to issue #{ISSUE_NUMBER}.
-
-    1. Read the issue: gh issue view {ISSUE_NUMBER}
-    2. Review requirements and acceptance criteria
-    3. Add design specs as a comment following the template in your AGENT.md
+    After completing your work, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-design-specs.md
 ```
+
+### 4c. Read Designer Report
+
+After designer returns, read `REPORT-design-specs.md` to understand what was produced.
 
 ---
 
-## Step 4: Implement
+## Step 5: Implement
 
 Update issue label:
 ```bash
 gh issue edit {ISSUE_NUMBER} --add-label "in-progress" --remove-label "ready"
 ```
 
-Spawn the developer agent:
+### 5a. Write Developer Briefing
+
+Write `orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md`:
+
+```markdown
+# Agent Briefing: implement
+Generated: {timestamp}
+
+## Your Task
+Implement issue #{ISSUE_NUMBER}: {title}
+
+## Context
+- Acceptance criteria: {from issue body}
+- Mode: {single-issue/all-issues}
+
+## Prior Agent Activity
+{If designer created specs, summarize from REPORT-design-specs.md:}
+- **Designer**: Created UI specifications including {summary of specs}
+
+## Resources (Read as Needed)
+- Issue details: `gh issue view {ISSUE_NUMBER}`
+- Design specs: Check issue comments for "**[Designer]** Design Specifications"
+- design-system.md: Available design tokens
+- Existing patterns in codebase
+
+## Expected Output
+- Working implementation matching acceptance criteria
+- Tests passing
+- PR created with "Closes #{ISSUE_NUMBER}" in body
+```
+
+### 5b. Spawn Developer Agent
 
 ```
 Use the Task tool with:
@@ -105,48 +187,117 @@ Use the Task tool with:
   prompt: |
     You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
 
-    **[Developer]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md first.
 
-    Implement issue #{ISSUE_NUMBER}.
-
-    Context:
-    - Issue: {title}
-    - Acceptance criteria: {from issue body}
-    - Design specs: {from designer comment - look for "**[Designer]** Design Specifications"}
-    - Design intent: {summarize the "Design Intent" section from designer comment - why this approach}
-    - Design system: Read `design-system.md` for all available tokens (colors, spacing, typography)
-
-    For UI work:
-    - Read design-system.md FIRST to understand available tokens
-    - Use design tokens (CSS custom properties), not hardcoded values
-    - If design specs are unclear, ask Designer for clarification before guessing
-    - Check existing components for consistent patterns
-
-    Steps:
-    1. Read the issue: gh issue view {ISSUE_NUMBER}
-    2. For UI work: Read design-system.md and Designer's specifications
-    3. Implement the feature following acceptance criteria and design specs
-    4. Write tests for your implementation
-    5. Create a PR with "Closes #{ISSUE_NUMBER}" in the body
+    After completing your work, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-implement.md
 ```
 
-Wait for developer to create PR. Get PR number from output or:
+### 5c. Read Developer Report and Get PR Number
+
+After developer returns, read `REPORT-implement.md` to understand what was done.
+
+Get PR number from report or:
 ```bash
 gh pr list --search "head:{ISSUE_NUMBER}-" --json number --jq '.[0].number'
 ```
 
 ---
 
-## Step 5: Coordinate Reviews
+## Step 6: Coordinate Reviews
 
 Update issue label:
 ```bash
 gh issue edit {ISSUE_NUMBER} --add-label "needs-review" --remove-label "in-progress"
 ```
 
-### Architect Review (Required)
+### 6a. Write Review Briefings
+
+Write briefings for each reviewer, including prior agent activity.
+
+**BRIEFING-architect-review.md:**
+```markdown
+# Agent Briefing: architect-review
+Generated: {timestamp}
+
+## Your Task
+Review PR #{pr_number} for technical quality.
+
+## Context
+- Issue: #{ISSUE_NUMBER} - {title}
+- Developer has completed implementation
+
+## Prior Agent Activity
+- **Developer**: {summary from REPORT-implement.md - what was built, key decisions, any concerns}
+
+## Resources (Read as Needed)
+- PR details: `gh pr view {pr_number}`
+- PR diff: `gh pr diff {pr_number}`
+
+## Expected Output
+Post standardized review comment:
+- ✅ APPROVED - Architect (if acceptable)
+- ❌ CHANGES REQUESTED - Architect (if issues found)
+```
+
+**BRIEFING-designer-review.md (if UI):**
+```markdown
+# Agent Briefing: designer-review
+Generated: {timestamp}
+
+## Your Task
+Review PR #{pr_number} for UI/UX quality.
+
+## Context
+- Issue: #{ISSUE_NUMBER} - {title}
+- You provided design specs earlier
+
+## Prior Agent Activity
+- **Designer** (specs): {summary from REPORT-design-specs.md}
+- **Developer**: {summary from REPORT-implement.md}
+
+## Resources (Read as Needed)
+- PR details: `gh pr view {pr_number}`
+- Your original design specs in issue comments
+
+## Expected Output
+Post standardized review comment:
+- ✅ APPROVED - Designer
+- ❌ CHANGES REQUESTED - Designer
+- N/A - No UI changes (if applicable)
+```
+
+**BRIEFING-test.md:**
+```markdown
+# Agent Briefing: test
+Generated: {timestamp}
+
+## Your Task
+Verify PR #{pr_number} meets acceptance criteria.
+
+## Context
+- Issue: #{ISSUE_NUMBER} - {title}
+
+## Prior Agent Activity
+- **Developer**: {summary from REPORT-implement.md}
+
+## Resources (Read as Needed)
+- PR details: `gh pr view {pr_number}`
+- Issue acceptance criteria: `gh issue view {ISSUE_NUMBER}`
+- Test commands: Check `.claude/commands.md`
+
+## Expected Output
+Post standardized review comment:
+- ✅ APPROVED - Tester (all tests pass, criteria verified)
+- ❌ CHANGES REQUESTED - Tester (issues found)
+```
+
+### 6b. Spawn Review Agents (Parallel)
+
+Spawn all reviewers in parallel (single message, multiple Task calls):
 
 ```
+# Architect review
 Use the Task tool with:
   subagent_type: "general-purpose"
   model: "sonnet"
@@ -154,20 +305,12 @@ Use the Task tool with:
   prompt: |
     You are the Architect agent. Load your role from .claude/agents/architect/AGENT.md
 
-    **[Architect]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-architect-review.md first.
 
-    Review PR #{pr_number} for technical quality.
+    After completing your review, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-architect-review.md
 
-    1. Read the PR: gh pr view {pr_number}
-    2. Review the code changes for architecture, patterns, and quality
-    3. Post a standardized review comment:
-       - ✅ APPROVED - Architect (if acceptable)
-       - ❌ CHANGES REQUESTED - Architect (if issues found)
-```
-
-### Designer Review (If UI Changes)
-
-```
+# Designer review (if UI)
 Use the Task tool with:
   subagent_type: "general-purpose"
   model: "sonnet"
@@ -175,21 +318,12 @@ Use the Task tool with:
   prompt: |
     You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
 
-    **[Designer]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-designer-review.md first.
 
-    Review PR #{pr_number} for UI/UX quality.
+    After completing your review, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-designer-review.md
 
-    1. Read the PR: gh pr view {pr_number}
-    2. Check if there are UI changes
-    3. If no UI changes: Post "**[Designer]** N/A - No UI changes in this PR."
-    4. Otherwise post standardized review comment:
-       - ✅ APPROVED - Designer
-       - ❌ CHANGES REQUESTED - Designer
-```
-
-### Tester Review (Required)
-
-```
+# Tester verification
 Use the Task tool with:
   subagent_type: "general-purpose"
   model: "sonnet"
@@ -197,21 +331,22 @@ Use the Task tool with:
   prompt: |
     You are the Tester agent. Load your role from .claude/agents/tester/AGENT.md
 
-    **[Tester]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-test.md first.
 
-    Verify PR #{pr_number}.
-
-    1. Read the PR: gh pr view {pr_number}
-    2. Run the test suite
-    3. Perform manual verification if needed
-    4. Post a standardized review comment:
-       - ✅ APPROVED - Tester
-       - ❌ CHANGES REQUESTED - Tester
+    After completing verification, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-test.md
 ```
+
+### 6c. Read All Review Reports
+
+After all reviewers return, read their reports:
+- `REPORT-architect-review.md`
+- `REPORT-designer-review.md` (if UI)
+- `REPORT-test.md`
 
 ---
 
-## Step 6: Handle Change Requests
+## Step 7: Handle Change Requests
 
 Check PR comments for review status:
 ```bash
@@ -219,6 +354,40 @@ gh pr view {pr_number} --comments
 ```
 
 **If any `❌ CHANGES REQUESTED`:**
+
+### 7a. Write Feedback Briefing
+
+Write `BRIEFING-address-feedback.md`:
+
+```markdown
+# Agent Briefing: address-feedback
+Generated: {timestamp}
+
+## Your Task
+Address review feedback on PR #{pr_number}.
+
+## Context
+- Issue: #{ISSUE_NUMBER}
+- Reviewers have requested changes
+
+## Prior Agent Activity
+- **Architect**: {from REPORT-architect-review.md - what was approved/rejected}
+- **Designer**: {from REPORT-designer-review.md - if applicable}
+- **Tester**: {from REPORT-test.md - test results}
+
+## Feedback to Address
+{List specific feedback items from reviews}
+
+## Resources (Read as Needed)
+- PR comments: `gh pr view {pr_number} --comments`
+
+## Expected Output
+- All feedback addressed
+- Changes pushed
+- Comment posted that changes are ready for re-review
+```
+
+### 7b. Spawn Developer for Fixes
 
 ```
 Use the Task tool with:
@@ -228,26 +397,21 @@ Use the Task tool with:
   prompt: |
     You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
 
-    **[Developer]**
+    Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-address-feedback.md first.
 
-    Address review feedback on PR #{pr_number}.
-
-    Feedback to address:
-    {summary of requested changes}
-
-    1. Read the PR and feedback: gh pr view {pr_number} --comments
-    2. Make the requested changes
-    3. Push the fixes
-    4. Comment that changes have been addressed
+    After completing fixes, write your report to:
+    orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-address-feedback.md
 ```
 
-After developer pushes fixes, re-request the relevant review(s).
+### 7c. Re-request Reviews
+
+After developer pushes fixes, re-run relevant reviews with new briefings.
 
 Repeat until all required approvals are present.
 
 ---
 
-## Step 7: Report Result
+## Step 8: Report Result
 
 ### Check for All Approvals
 
@@ -273,7 +437,7 @@ Include:
 
 ### Blocked
 
-If dependencies not met (from Step 2):
+If dependencies not met (from Step 3):
 
 ```
 Report: "BLOCKED: Issue #{ISSUE_NUMBER} is blocked on #{dep_number}"
@@ -306,6 +470,30 @@ The caller (either /work command or /work-all orchestrator) will parse the outpu
 
 ---
 
+## Orchestration Folder After Completion
+
+After working on issue #42, the folder should contain:
+
+```
+orchestration/issues/42-user-auth/
+├── BRIEFING-design-specs.md      # (if UI) What designer was asked to do
+├── REPORT-design-specs.md        # (if UI) What designer did
+├── BRIEFING-implement.md         # What developer was asked to do
+├── REPORT-implement.md           # What developer did
+├── BRIEFING-architect-review.md  # What architect was asked to review
+├── REPORT-architect-review.md    # Architect's review findings
+├── BRIEFING-designer-review.md   # (if UI) What designer was asked to review
+├── REPORT-designer-review.md     # (if UI) Designer's review findings
+├── BRIEFING-test.md              # What tester was asked to verify
+├── REPORT-test.md                # Tester's verification results
+├── BRIEFING-address-feedback.md  # (if changes requested) Feedback to address
+└── REPORT-address-feedback.md    # (if changes requested) How feedback was addressed
+```
+
+This provides a complete audit trail of all agent communication for the issue.
+
+---
+
 ## Commands Reference
 
 ```bash
@@ -321,4 +509,7 @@ gh pr comment {n} --body "..."
 # Dependency check
 gh issue view {n} --json body --jq '.body' | grep -oE 'Depends on #[0-9]+'
 gh issue view {n} --json state --jq '.state'
+
+# Orchestration folder
+mkdir -p orchestration/issues/{issue}-{slug}
 ```

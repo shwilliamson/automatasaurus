@@ -17,6 +17,7 @@ Commands run in the main conversation and orchestrate agents:
 |---------|---------|----------|
 | `/discovery` | Requirements gathering | `discovery.md`, issues |
 | `/work-plan` | Implementation planning | `implementation-plan.md` |
+| `/contextualize` | Generate agent context | `PROJECT.md` files |
 | `/work {n}` | Single issue | PR (user merges) |
 | `/work-all` | All issues | PRs merged, issues closed |
 
@@ -88,7 +89,9 @@ User: /work-plan (optional)
 User: /work-all
            ↓
     LOOP for each issue:
+      - Setup orchestration folder
       - Check dependencies
+      - Spawn Designer → specs (if UI)
       - Spawn Developer → implements, creates PR
       - Spawn Architect → reviews PR
       - Spawn Designer → reviews PR (if UI)
@@ -99,6 +102,73 @@ User: /work-all
            ↓
     All complete → Notify user
 ```
+
+---
+
+## Bidirectional Context Flow
+
+Sub-agents start with fresh context (no conversation history). The orchestration layer uses **briefings** and **reports** to communicate context and capture results.
+
+### Orchestration Folder Structure
+
+```
+orchestration/
+├── discovery/
+│   └── {date}-{feature-slug}/
+│       ├── BRIEFING-architect-review.md
+│       ├── REPORT-architect-review.md
+│       └── ...
+├── planning/
+│   └── {date}-{plan-name}/
+│       └── ...
+└── issues/
+    └── {issue-number}-{slug}/
+        ├── BRIEFING-design-specs.md
+        ├── REPORT-design-specs.md
+        ├── BRIEFING-implement.md
+        ├── REPORT-implement.md
+        ├── BRIEFING-architect-review.md
+        ├── REPORT-architect-review.md
+        ├── BRIEFING-designer-review.md
+        ├── REPORT-designer-review.md
+        ├── BRIEFING-test.md
+        └── REPORT-test.md
+```
+
+### How It Works
+
+**Parent agent** (orchestrating workflow):
+1. Creates briefing file in `orchestration/{type}/{id}/BRIEFING-{step}.md`
+2. Includes briefing path in Task prompt when spawning sub-agent
+3. After Task returns, reads `REPORT-{step}.md` from same folder
+4. Includes report summary in next agent's briefing
+
+**Sub-agent** (following AGENT.md protocol):
+1. Reads briefing file path from task prompt
+2. Reads briefing as first action
+3. Does work
+4. Writes report to `REPORT-{step}.md` in same folder before completing
+
+### Context Chain
+
+Each agent receives context about what previous agents did:
+
+```
+1. Designer creates specs → writes REPORT-design-specs.md
+2. Developer briefing includes designer's report summary
+3. Developer implements → writes REPORT-implement.md
+4. Reviewer briefings include developer's report summary
+5. ...and so on
+```
+
+This enables informed decisions throughout the workflow.
+
+### Benefits
+
+- **Audit trail**: Full history of agent communication per issue
+- **Debugging**: Can review what context each agent received
+- **No collisions**: Each spawn gets unique files
+- **Context chain**: Parent aggregates prior work into new briefings
 
 ---
 
@@ -135,9 +205,9 @@ Track issue progress:
 
 | Label | Description |
 |-------|-------------|
-| `ready` | No blocking dependencies |
+| `ready` | No blocking dependencies, can be worked |
 | `in-progress` | Currently being implemented |
-| `blocked` | Waiting on dependencies |
+| `blocked` | Waiting on dependencies or input |
 | `needs-review` | PR open, awaiting reviews |
 
 ### State Flow
@@ -245,6 +315,8 @@ The workflow produces these artifacts:
 |------|---------|---------|
 | `discovery.md` | `/discovery` | Requirements, flows, architecture |
 | `implementation-plan.md` | `/work-plan` | Sequenced work order |
+| `.claude/agents/*/PROJECT.md` | `/contextualize` | Role-specific context |
+| `orchestration/issues/*/` | `/work`, `/work-all` | Briefings and reports per issue |
 
 ---
 
