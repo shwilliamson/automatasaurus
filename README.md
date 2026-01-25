@@ -25,6 +25,9 @@ claude
 # Review and sequence the implementation plan
 /work-plan
 
+# Generate agent-specific context files
+/contextualize
+
 # Work through all issues autonomously
 /work-all
 ```
@@ -64,6 +67,8 @@ Creates GitHub issues with:
 User approves milestone/issue breakdown
     ↓
 User: /work-plan (analyze dependencies, create sequence)
+    ↓
+User: /contextualize (generate agent-specific context)
     ↓
 User: /work-all
 ```
@@ -110,6 +115,7 @@ User: /work-all
 | Agent | Model | Role | Responsibilities |
 |-------|-------|------|------------------|
 | **Architect** | Opus | Design | System design, ADRs, required PR reviews, stuck-issue analysis |
+| **Contextualizer** | Sonnet | Preparation | Synthesizes discovery/planning into agent-specific PROJECT.md files |
 | **Developer** | Sonnet | Implementation | Feature development, bug fixes, PRs, addresses feedback |
 | **Designer** | Sonnet | Experience | UI/UX specs, accessibility, design reviews (if UI changes) |
 | **Tester** | Sonnet | Quality | Test execution, Playwright verification, required PR reviews |
@@ -122,6 +128,7 @@ All agents prefix their comments with their identity:
 
 ```markdown
 **[Product Owner]** Starting work on issue #5. Routing to Developer.
+**[Contextualizer]** Project context generated for all agents.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** ✅ APPROVED - Architect. Clean separation of concerns.
 **[Designer]** N/A - No UI changes in this PR.
@@ -169,6 +176,7 @@ your-project/
 │   ├── README.md                # Framework documentation
 │   ├── agents/                  # AI agents
 │   │   ├── architect/           # Design & required PR reviews
+│   │   ├── contextualizer/      # Agent context generation
 │   │   ├── developer/           # Implementation & PRs
 │   │   ├── designer/            # UI/UX design specs
 │   │   └── tester/              # QA, Playwright, merge authority
@@ -184,6 +192,7 @@ your-project/
 │   │   ├── on-stop.sh
 │   │   └── request-attention.sh
 │   └── commands/                # Slash command definitions
+│       ├── contextualize.md
 │       ├── discovery.md
 │       ├── work.md
 │       ├── work-all.md
@@ -284,6 +293,7 @@ The primary way to invoke workflows:
 |---------|-------------|
 | `/discovery [feature]` | Start discovery to understand requirements and create plan |
 | `/work-plan` | Analyze open issues, create sequenced implementation plan |
+| `/contextualize` | Generate agent-specific PROJECT.md context files |
 | `/work-all` | Work through all open issues autonomously |
 | `/work [issue#]` | Work on a specific issue |
 
@@ -313,6 +323,22 @@ Before starting autonomous work, run this command to:
 - Identify blockers and risks
 
 This step helps you review and approve the execution order before `/work-all` begins.
+
+### `/contextualize` - Agent Context Generation
+
+```
+/contextualize
+```
+
+After planning, run this command to prepare each agent with project-specific guidance:
+- Reads `discovery.md` and `implementation-plan.md`
+- Generates tailored `PROJECT.md` files for each agent folder
+- Developer gets implementation guidance, architecture patterns, tech decisions
+- Architect gets review context, NFRs, integration dependencies
+- Designer gets user personas, flows, accessibility requirements
+- Tester gets acceptance criteria, edge cases, test coverage needs
+
+The generated context helps agents make better decisions aligned with your project.
 
 ### `/work-all` - Autonomous Loop
 

@@ -103,17 +103,41 @@ Use the Task tool with:
 
     ## Interaction Patterns
     - Hover, focus, and active states
-    - Transitions and animations
+    - Transitions and animations (subtle, responsive, not decorative)
     - Loading states
     - Empty states
 
     ## Accessibility Standards
-    - Minimum contrast ratios
-    - Focus indicators
-    - Touch target sizes
+    - Minimum contrast ratios (4.5:1 text, 3:1 UI)
+    - Focus indicators (visible, consistent)
+    - Touch target sizes (minimum 44x44px)
 
-    The goal is an intuitive, polished user experience with appealing colors
-    that work harmoniously together. The design should feel modern and cohesive.
+    ## Design Quality Criteria
+
+    Apply these principles when making design decisions:
+
+    **Visual Hierarchy:** Important actions should be prominent. Users should know
+    where to look and what to do within 3 seconds.
+
+    **Simplicity:** Every element should earn its place. When something feels
+    complex, question whether the complexity is necessary.
+
+    **Consistency:** Reuse patterns. Novel UI should only exist when it meaningfully
+    improves the experience.
+
+    **Restraint:** Default to fewer colors, more whitespace, and simpler solutions.
+    A design that does less but does it well beats one that does more poorly.
+
+    **Project Personality:** Consider:
+    - Is this playful or professional?
+    - Minimal or feature-rich?
+    - Technical or consumer-facing?
+    Let the answers inform aesthetic choices.
+
+    The goal is an intuitive, polished user experience where colors work
+    harmoniously, typography creates clear hierarchy, spacing feels balanced,
+    and the overall aesthetic feels intentional rather than assembled from
+    random choices.
 
     Output: Write the design system to `design-system.md` (or update existing).
     Return the path to the design document when complete.

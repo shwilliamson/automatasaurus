@@ -112,12 +112,22 @@ Use the Task tool with:
     Context:
     - Issue: {title}
     - Acceptance criteria: {from issue body}
-    - Design specs: {from designer comment, if applicable}
+    - Design specs: {from designer comment - look for "**[Designer]** Design Specifications"}
+    - Design intent: {summarize the "Design Intent" section from designer comment - why this approach}
+    - Design system: Read `design-system.md` for all available tokens (colors, spacing, typography)
 
+    For UI work:
+    - Read design-system.md FIRST to understand available tokens
+    - Use design tokens (CSS custom properties), not hardcoded values
+    - If design specs are unclear, ask Designer for clarification before guessing
+    - Check existing components for consistent patterns
+
+    Steps:
     1. Read the issue: gh issue view {ISSUE_NUMBER}
-    2. Implement the feature following acceptance criteria
-    3. Write tests for your implementation
-    4. Create a PR with "Closes #{ISSUE_NUMBER}" in the body
+    2. For UI work: Read design-system.md and Designer's specifications
+    3. Implement the feature following acceptance criteria and design specs
+    4. Write tests for your implementation
+    5. Create a PR with "Closes #{ISSUE_NUMBER}" in the body
 ```
 
 Wait for developer to create PR. Get PR number from output or:
