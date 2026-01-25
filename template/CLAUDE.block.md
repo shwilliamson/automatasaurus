@@ -48,6 +48,7 @@ The following agents are available in `.claude/agents/`:
 | Agent | Role | Model | Review Status |
 |-------|------|-------|---------------|
 | `architect` | System design, ADRs, stuck-issue analysis, PR review | Opus | **Required** |
+| `contextualizer` | PROJECT.md generation, context synthesis | Sonnet | N/A |
 | `designer` | UI/UX specs, accessibility, design review | Sonnet | If UI changes |
 | `developer` | Implementation, PRs, addressing feedback | Sonnet | N/A |
 | `tester` | QA, Playwright, verification | Sonnet | **Required** |
@@ -217,6 +218,7 @@ Primary way to invoke workflows:
 |---------|-------------|
 | `/discovery [feature]` | Start discovery to understand requirements and create plan |
 | `/work-plan` | Analyze open issues, create sequenced implementation plan |
+| `/contextualize` | Generate PROJECT.md files for each agent from discovery/planning |
 | `/work-all` | Work through all open issues autonomously |
 | `/work [issue#]` | Work on a specific issue |
 

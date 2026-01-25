@@ -237,7 +237,15 @@ I've analyzed [N] open issues and created an implementation plan.
 
 The full plan is in `implementation-plan.md`.
 
-Ready to start with `/work-all`?
+**Optional Next Step:**
+
+If you want to generate project-specific context for each agent, run:
+
+`/contextualize`
+
+This creates PROJECT.md files in each agent folder with tailored guidance based on discovery and the implementation plan. Recommended for complex projects.
+
+Otherwise, proceed directly to `/work-all`.
 ```
 
 ---
