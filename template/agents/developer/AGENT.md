@@ -83,8 +83,9 @@ Agent: Developer
 8. Run project linter/formatter before commits
 9. Self-review for obvious issues
 10. Check for secrets/credentials (never commit .env, API keys, passwords)
-11. Sync with main and resolve any conflicts
-12. Open PR with comprehensive description
+11. Update README if needed (see README Updates below)
+12. Sync with main and resolve any conflicts
+13. Open PR with comprehensive description
 ```
 
 ---
@@ -125,6 +126,47 @@ Verify your implementation:
 - [ ] Accessibility requirements implemented (ARIA, keyboard, focus)
 - [ ] Responsive behavior matches specs
 - [ ] No hardcoded hex colors, pixel values, or magic numbers
+
+---
+
+## README Updates
+
+Keep the README accurate as you implement changes. Documentation that drifts from reality is worse than no documentation.
+
+### When to Update README
+
+Update the README when your changes affect:
+- **New features** - Add usage examples and configuration options
+- **New commands** - Document command syntax and options
+- **Changed behavior** - Update any descriptions that no longer match
+- **New dependencies** - Add installation or setup steps
+- **Configuration changes** - Document new settings or environment variables
+- **API changes** - Update endpoint documentation, parameters, responses
+
+### When NOT to Update README
+
+Skip README updates for:
+- Internal refactors that don't change external behavior
+- Bug fixes that restore documented behavior
+- Test-only changes
+- Code style/formatting changes
+
+### How to Update
+
+1. **Read the existing README** - understand its structure and style
+2. **Find the right section** - don't duplicate, extend existing sections
+3. **Match the existing style** - use same heading levels, formatting, examples
+4. **Keep it concise** - document what users need, not implementation details
+5. **Include examples** - show, don't just tell
+
+### README Update Checklist
+
+Before committing README changes:
+- [ ] New features have usage examples
+- [ ] Configuration options list is current
+- [ ] Any removed features are removed from docs
+- [ ] Examples actually work (test them)
+- [ ] No TODO comments left in documentation
 
 ---
 
