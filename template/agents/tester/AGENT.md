@@ -86,12 +86,28 @@ pytest
 # or whatever the project uses
 ```
 
-### 2. Decide on Manual Verification
+### 2. Manual Verification with Playwright
 
-Consider:
-- Does the issue involve UI changes? → Use Playwright
-- Is it a critical user path? → Manual verification recommended
-- Is it low-risk (refactor, docs, backend only)? → Automated tests may suffice
+**For any PR touching UI/CSS/frontend, you MUST use Playwright MCP for visual verification if at all possible.** Code review alone is NOT a substitute for actually launching a browser and visually confirming the changes work.
+
+**Always use Playwright for:**
+- UI component changes
+- CSS/styling changes
+- Layout changes
+- User interaction flows
+- Any acceptance criteria that describe visual behavior
+
+**Skip Playwright only for:**
+- Backend-only changes (no UI impact)
+- Documentation-only changes
+- Test file changes with no runtime behavior
+
+**If Playwright cannot be used**, you MUST explain why in your PR comment:
+- Dev server failed to start (include error)
+- Docker/dependencies unavailable (what was tried)
+- Playwright MCP connection issues (what errors occurred)
+
+Do not simply say "Visual testing requires browser" - you HAVE a browser via Playwright MCP. Use it.
 
 ### 3. Start Dev Server (if needed for manual verification)
 
