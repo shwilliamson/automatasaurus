@@ -10,8 +10,8 @@
   },
   "permissions": {
     "allow": [
-      "Bash(*)",
-      "Read(*)",
+      "Bash",
+      "Read",
       "Edit(./**)",
       "Write(./**)",
       "WebSearch"
