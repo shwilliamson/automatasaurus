@@ -340,6 +340,45 @@ Notifications are also sent automatically on stop based on context.
 | `AUTOMATASAURUS_SOUND` | Set to "false" to disable notification sounds |
 | `AUTOMATASAURUS_LOG` | Custom log file location |
 
+## Sandbox Configuration
+
+Automatasaurus enables sandbox mode by default for autonomous operation with safety boundaries:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "mode": "auto-allow",
+    "filesystem": {
+      "writeDeny": ["~/.ssh", "~/.bashrc", "/etc", "/bin", ...]
+    },
+    "network": {
+      "allowedDomains": ["github.com", "npmjs.org", "pypi.org", ...]
+    }
+  }
+}
+```
+
+**Key features:**
+- `auto-allow` mode: Bash commands run without prompts inside sandbox boundaries
+- Protected paths: SSH keys, shell configs, system directories are write-protected
+- Network allowlist: Only approved domains (GitHub, npm, PyPI) accessible
+
+**To add more allowed domains**, add to `settings.local.json`:
+```json
+{
+  "sandbox": {
+    "network": {
+      "allowedDomains": ["your-internal-registry.com"]
+    }
+  }
+}
+```
+
+**Requirements:**
+- macOS: Built-in (Seatbelt)
+- Linux/WSL2: `sudo apt install bubblewrap socat`
+
 ## Circuit Breaker Configuration
 
 Limits are configured in `.claude/settings.json` under `automatasaurus.limits`:

@@ -23,7 +23,8 @@ This skill expects an `ISSUE_NUMBER` to be provided by the caller.
 5. IMPLEMENT → Invoke developer agent with briefing
 6. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
 7. HANDLE CHANGE REQUESTS → Loop until all approved
-8. REPORT RESULT → Success, Blocked, or Escalated
+8. COMMIT ORCHESTRATION FILES → Preserve audit trail in branch
+9. REPORT RESULT → Success, Blocked, or Escalated
 ```
 
 ---
@@ -411,7 +412,38 @@ Repeat until all required approvals are present.
 
 ---
 
-## Step 8: Report Result
+## Step 8: Commit Orchestration Files
+
+Before reporting success, commit all briefings and reports to the branch so they're preserved in the PR.
+
+```bash
+# Switch to the issue branch
+BRANCH=$(gh pr view {pr_number} --json headRefName --jq '.headRefName')
+git checkout "$BRANCH"
+
+# Add all orchestration files for this issue
+git add orchestration/issues/{ISSUE_NUMBER}-{slug}/
+
+# Commit with clear message
+git commit -m "docs: add agent orchestration files for #{ISSUE_NUMBER}
+
+Includes briefings and reports from:
+- Designer (if UI)
+- Developer
+- Architect review
+- Tester verification
+
+These provide audit trail of agent coordination."
+
+# Push to the branch
+git push
+```
+
+This ensures the full agent communication history is preserved in the PR and merged with the code.
+
+---
+
+## Step 9: Report Result
 
 ### Check for All Approvals
 

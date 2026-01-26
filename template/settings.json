@@ -10,19 +10,81 @@
   },
   "permissions": {
     "allow": [
-      "Bash(git:*)",
-      "Bash(gh:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(claude:*)",
-      "Bash(*/.claude/hooks/*)",
+      "Bash(*)",
+      "Read(*)",
+      "Edit(./**)",
+      "Write(./**)",
       "WebSearch"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
-      "Read(./secrets/**)"
+      "Read(./secrets/**)",
+      "Edit(../)",
+      "Edit(~/**)",
+      "Edit(//etc/**)",
+      "Edit(//var/**)",
+      "Edit(//bin/**)",
+      "Edit(//sbin/**)",
+      "Edit(//usr/**)",
+      "Edit(//System/**)",
+      "Write(../)",
+      "Write(~/**)",
+      "Write(//etc/**)",
+      "Write(//var/**)",
+      "Write(//bin/**)",
+      "Write(//sbin/**)",
+      "Write(//usr/**)",
+      "Write(//System/**)",
+      "Bash(rm -rf ~*)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ../*)",
+      "Bash(rm -r ~*)",
+      "Bash(rm -r /*)",
+      "Bash(rm -r ../*)",
+      "Bash(chmod -R 777 /*)",
+      "Bash(chown -R * /*)"
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "mode": "auto-allow",
+    "filesystem": {
+      "writeDeny": [
+        "~/.ssh",
+        "~/.gnupg",
+        "~/.bashrc",
+        "~/.zshrc",
+        "~/.profile",
+        "~/.bash_profile",
+        "~/.config/claude",
+        "/etc",
+        "/bin",
+        "/sbin",
+        "/usr/bin",
+        "/usr/sbin",
+        "/System"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "raw.githubusercontent.com",
+        "ghcr.io",
+        "npmjs.org",
+        "registry.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "docker.io",
+        "registry-1.docker.io",
+        "auth.docker.io",
+        "index.docker.io",
+        "production.cloudflare.docker.com",
+        "gcr.io",
+        "quay.io"
+      ]
+    }
   },
   "hooks": {
     "Stop": [
