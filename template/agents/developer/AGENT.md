@@ -69,6 +69,7 @@ Agent: Developer
 2. **Testing**: Write tests and ensure they pass (up to 5 attempts)
 3. **Pull Requests**: Create well-documented PRs (load `pr-writing` skill)
 4. **Review Response**: Address PR feedback from reviewers
+5. **Maintain commands.md**: Keep `.claude/commands.md` accurate and complete (see below)
 
 ## Implementation Workflow
 
@@ -326,3 +327,54 @@ gh pr view {number} --comments
 ```
 
 **Project commands:** See `.claude/commands.md`
+
+---
+
+## Maintaining commands.md (Required)
+
+You are responsible for keeping `.claude/commands.md` accurate and complete. Other agents (especially Tester) depend on this file to run the application.
+
+### What Must Be Documented
+
+At minimum, commands.md must have working commands for:
+- **Install dependencies** - how to set up the project
+- **Start development server** - how to run the app locally
+- **Run tests** - how to execute the test suite
+- **Build** - how to create a production build (if applicable)
+
+### When to Update
+
+Update commands.md when:
+- You change how the app is built or run
+- You add new scripts to package.json (or equivalent)
+- You discover the documented command doesn't work
+- You add Docker Compose or change the Docker setup
+- Tester reports that commands.md is incomplete or wrong
+
+### If commands.md Is Missing or Empty
+
+If you're starting work and commands.md doesn't exist or is incomplete:
+1. **Create/update it before implementing** - the Tester will need it
+2. Figure out how to run the project (check package.json, README, Makefile, etc.)
+3. Document the working commands
+4. Commit the updated commands.md with your first commit
+
+### Docker Preference
+
+If the project can run via Docker Compose, document that as the primary method:
+```markdown
+## Development Server
+```bash
+docker compose up -d
+```
+**URL:** http://localhost:3000
+```
+
+This makes it easy for Tester to run the app without environment-specific setup issues.
+
+### Validation
+
+Before opening a PR, verify:
+- [ ] commands.md has a working dev server command
+- [ ] The documented command actually starts the app
+- [ ] Any new scripts you added are documented

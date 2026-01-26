@@ -16,20 +16,65 @@ This skill expects an `ISSUE_NUMBER` to be provided by the caller.
 ## Workflow
 
 ```
-1. SETUP ORCHESTRATION FOLDER
-2. GET ISSUE DETAILS
-3. CHECK DEPENDENCIES → If blocked, report and stop
-4. GET DESIGN SPECS (if UI) → Invoke designer agent with briefing
-5. IMPLEMENT → Invoke developer agent with briefing
-6. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
-7. HANDLE CHANGE REQUESTS → Loop until all approved
-8. COMMIT ORCHESTRATION FILES → Preserve audit trail in branch
-9. REPORT RESULT → Success, Blocked, or Escalated
+1. PRE-FLIGHT CHECK → Verify commands.md exists and is complete
+2. SETUP ORCHESTRATION FOLDER
+3. GET ISSUE DETAILS
+4. CHECK DEPENDENCIES → If blocked, report and stop
+5. GET DESIGN SPECS (if UI) → Invoke designer agent with briefing
+6. IMPLEMENT → Invoke developer agent with briefing
+7. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
+8. HANDLE CHANGE REQUESTS → Loop until all approved
+9. COMMIT ORCHESTRATION FILES → Preserve audit trail in branch
+10. REPORT RESULT → Success, Blocked, or Escalated
 ```
 
 ---
 
-## Step 1: Setup Orchestration Folder
+## Step 1: Pre-flight Check
+
+Before starting work, verify the project is set up for E2E testing.
+
+### Check commands.md Exists and Is Complete
+
+```bash
+# Check if commands.md exists
+if [ ! -f .claude/commands.md ]; then
+  echo "ERROR: .claude/commands.md does not exist"
+fi
+
+# Read and check for required commands
+cat .claude/commands.md
+```
+
+**Required commands that must be documented:**
+- Development server command (how to run the app)
+- Development server URL (where the app runs)
+- Test command (how to run tests)
+
+### If commands.md Is Missing or Incomplete
+
+**STOP** and report to the user:
+
+```
+PRE-FLIGHT FAILED: commands.md is incomplete
+
+Before I can work on issues, .claude/commands.md must document:
+- How to start the development server
+- The URL where the app runs
+- How to run tests
+
+Please update .claude/commands.md with these commands, or I won't be able to verify the implementation works.
+```
+
+**Do NOT proceed** until commands.md is complete. The Tester agent will need this to run E2E verification, and skipping E2E verification is unacceptable.
+
+### If commands.md Is Complete
+
+Continue to Step 2.
+
+---
+
+## Step 2: Setup Orchestration Folder
 
 Create a folder for this issue's briefings and reports:
 
@@ -46,7 +91,7 @@ All briefings and reports for this issue will go in this folder.
 
 ---
 
-## Step 2: Get Issue Details
+## Step 3: Get Issue Details
 
 ```bash
 gh issue view {ISSUE_NUMBER}
@@ -60,7 +105,7 @@ Extract:
 
 ---
 
-## Step 3: Check Dependencies
+## Step 4: Check Dependencies
 
 Parse "Depends on #X" from issue body:
 
@@ -82,13 +127,13 @@ Stop here.
 
 ---
 
-## Step 4: Get Design Specs (If UI Work)
+## Step 5: Get Design Specs (If UI Work)
 
 Check if issue involves UI (labels contain "ui", "frontend", or issue mentions UI work).
 
 If UI work needed and no design specs in comments:
 
-### 4a. Write Designer Briefing
+### 5a. Write Designer Briefing
 
 Write `orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md`:
 
@@ -118,7 +163,7 @@ Post design specifications as an issue comment following your AGENT.md template,
 - Responsive behavior
 ```
 
-### 4b. Spawn Designer Agent
+### 5b. Spawn Designer Agent
 
 ```
 Use the Task tool with:
@@ -134,20 +179,20 @@ Use the Task tool with:
     orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-design-specs.md
 ```
 
-### 4c. Read Designer Report
+### 5c. Read Designer Report
 
 After designer returns, read `REPORT-design-specs.md` to understand what was produced.
 
 ---
 
-## Step 5: Implement
+## Step 6: Implement
 
 Update issue label:
 ```bash
 gh issue edit {ISSUE_NUMBER} --add-label "in-progress" --remove-label "ready"
 ```
 
-### 5a. Write Developer Briefing
+### 6a. Write Developer Briefing
 
 Write `orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md`:
 
@@ -178,7 +223,7 @@ Implement issue #{ISSUE_NUMBER}: {title}
 - PR created with "Closes #{ISSUE_NUMBER}" in body
 ```
 
-### 5b. Spawn Developer Agent
+### 6b. Spawn Developer Agent
 
 ```
 Use the Task tool with:
@@ -194,7 +239,7 @@ Use the Task tool with:
     orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-implement.md
 ```
 
-### 5c. Read Developer Report and Get PR Number
+### 6c. Read Developer Report and Get PR Number
 
 After developer returns, read `REPORT-implement.md` to understand what was done.
 
@@ -205,14 +250,14 @@ gh pr list --search "head:{ISSUE_NUMBER}-" --json number --jq '.[0].number'
 
 ---
 
-## Step 6: Coordinate Reviews
+## Step 7: Coordinate Reviews
 
 Update issue label:
 ```bash
 gh issue edit {ISSUE_NUMBER} --add-label "needs-review" --remove-label "in-progress"
 ```
 
-### 6a. Write Review Briefings
+### 7a. Write Review Briefings
 
 Write briefings for each reviewer, including prior agent activity.
 
@@ -293,7 +338,7 @@ Post standardized review comment:
 - ❌ CHANGES REQUESTED - Tester (issues found)
 ```
 
-### 6b. Spawn Review Agents (Parallel)
+### 7b. Spawn Review Agents (Parallel)
 
 Spawn all reviewers in parallel (single message, multiple Task calls):
 
@@ -338,7 +383,7 @@ Use the Task tool with:
     orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-test.md
 ```
 
-### 6c. Read All Review Reports
+### 7c. Read All Review Reports
 
 After all reviewers return, read their reports:
 - `REPORT-architect-review.md`
@@ -347,7 +392,7 @@ After all reviewers return, read their reports:
 
 ---
 
-## Step 7: Handle Change Requests
+## Step 8: Handle Change Requests
 
 Check PR comments for review status:
 ```bash
@@ -356,7 +401,7 @@ gh pr view {pr_number} --comments
 
 **If any `❌ CHANGES REQUESTED`:**
 
-### 7a. Write Feedback Briefing
+### 8a. Write Feedback Briefing
 
 Write `BRIEFING-address-feedback.md`:
 
@@ -388,7 +433,7 @@ Address review feedback on PR #{pr_number}.
 - Comment posted that changes are ready for re-review
 ```
 
-### 7b. Spawn Developer for Fixes
+### 8b. Spawn Developer for Fixes
 
 ```
 Use the Task tool with:
@@ -404,7 +449,7 @@ Use the Task tool with:
     orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-address-feedback.md
 ```
 
-### 7c. Re-request Reviews
+### 8c. Re-request Reviews
 
 After developer pushes fixes, re-run relevant reviews with new briefings.
 
@@ -412,7 +457,7 @@ Repeat until all required approvals are present.
 
 ---
 
-## Step 8: Commit Orchestration Files
+## Step 9: Commit Orchestration Files
 
 Before reporting success, commit all briefings and reports to the branch so they're preserved in the PR.
 
@@ -443,7 +488,7 @@ This ensures the full agent communication history is preserved in the PR and mer
 
 ---
 
-## Step 9: Report Result
+## Step 10: Report Result
 
 ### Check for All Approvals
 

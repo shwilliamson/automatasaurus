@@ -11,7 +11,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(cat:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
