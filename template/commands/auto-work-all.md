@@ -1,33 +1,24 @@
-# Work Milestone - Process All Issues in a Milestone
+# Work All - Process All Open Issues
 
-Process all open issues in a specific GitHub milestone using context-isolated subagents.
-
-## Usage
-
-```
-/work-milestone {milestone_number}
-```
+Autonomously work through all open GitHub issues using context-isolated subagents.
 
 ## Workflow Mode
 
 ```
-WORKFLOW_MODE: milestone
-AUTO_MERGE: true (handled by this orchestrator after /work completes)
+WORKFLOW_MODE: all-issues
+AUTO_MERGE: true (handled by this orchestrator (aka Product Owner) after /auto-work-issue completes)
 ```
 
 ---
 
 ## Instructions
 
-You are the **Milestone Implementation Orchestrator**. You:
-1. Validate the milestone exists and get its details
-2. List all open issues in the milestone
-3. Select issues based on dependencies and priority
-4. Spawn `/work {n}` as a subagent for each issue (context isolation)
-5. Parse subagent output to determine result
-6. Merge successful PRs
-7. Enforce circuit breaker limits
-8. Report milestone-specific progress
+You are the **Autonomous Implementation Orchestrator**. You:
+1. Select issues based on dependencies and priority
+2. Spawn `/auto-work-issue {n}` as a subagent for each issue (context isolation)
+3. Parse subagent output to determine result
+4. Merge successful PRs
+5. Enforce circuit breaker limits
 
 ---
 
@@ -35,30 +26,8 @@ You are the **Milestone Implementation Orchestrator**. You:
 
 1. Load the `workflow-orchestration` skill
 2. Load the `github-workflow` skill
-3. Check for `implementation-plan.md` (if exists, filter to milestone issues and follow order)
+3. Check for `implementation-plan.md` (if exists, follow it)
 4. Read circuit breaker limits from `.claude/settings.json` under `automatasaurus.limits`
-
----
-
-## Validate Milestone
-
-Before starting, validate the milestone exists:
-
-```bash
-# Get milestone info
-gh api repos/:owner/:repo/milestones/$ARGUMENTS --jq '{title: .title, open_issues: .open_issues, description: .description}'
-```
-
-If milestone doesn't exist or has no open issues, report and exit:
-- Invalid milestone number → Error: "Milestone #X not found"
-- No open issues → Success: "Milestone #X ({title}) has no open issues"
-
-Store milestone info:
-```
-MILESTONE_NUMBER = $ARGUMENTS
-MILESTONE_TITLE = [from API response]
-MILESTONE_TOTAL = [open_issues from API response]
-```
 
 ---
 
@@ -77,8 +46,6 @@ Initialize counters:
 issuesProcessed = 0
 escalationCount = 0
 consecutiveFailures = 0
-successCount = 0
-blockedCount = 0
 ```
 
 ---
@@ -92,17 +59,17 @@ LOOP:
      - If escalationCount >= maxEscalationsBeforeStop → Stop (escalation limit)
      - If consecutiveFailures >= maxConsecutiveFailures → Stop (failure limit)
 
-  2. LIST MILESTONE ISSUES
-     - Use: gh issue list --state open --milestone $ARGUMENTS --json number,title,labels
-     - If no open issues remain → Notify milestone complete, exit
+  2. LIST OPEN ISSUES
+     - Check milestones and priorities
+     - If no open issues → Notify complete, exit
 
   3. SELECT NEXT ISSUE
-     - If implementation-plan.md exists: filter to milestone issues, follow plan order
+     - Follow implementation-plan.md if exists
      - Otherwise use selection criteria (see below)
      - Check dependencies (skip if blocked)
 
-  4. SPAWN /work SUBAGENT
-     - Use Task tool to spawn: "Run /work {issue_number}"
+  4. SPAWN /auto-work-issue SUBAGENT
+     - Use Task tool to spawn: "Run /auto-work-issue {issue_number}"
      - Wait for completion
      - Parse output for result
 
@@ -112,12 +79,12 @@ LOOP:
      - ESCALATED: Output contains "Escalating" or "stuck"
 
   6. HANDLE RESULT
-     - SUCCESS: Merge PR, reset consecutiveFailures, increment issuesProcessed, successCount
-     - BLOCKED: Increment blockedCount, skip issue, continue to next
+     - SUCCESS: Merge PR, reset consecutiveFailures, increment issuesProcessed
+     - BLOCKED: Skip issue, continue to next
      - ESCALATED: Increment escalationCount, consecutiveFailures
 
-  7. REPORT PROGRESS
-     - Show milestone-specific stats
+  7. CONTINUE
+     - Report progress
      - Loop back to step 1
 
 END LOOP
@@ -127,45 +94,30 @@ END LOOP
 
 ## Issue Selection Criteria
 
-### Primary: Follow Implementation Plan
+If no `implementation-plan.md` exists, select issues by:
 
-If `implementation-plan.md` exists:
-1. Read the plan
-2. Filter entries to only issues in this milestone (cross-reference with milestone issue list)
-3. Process in plan order
+### 1. Milestone First
+- Complete current milestone before next
+- Milestones in order (v1.0 before v1.1)
 
-### Fallback: Priority-Based Selection
-
-If no plan exists, select issues by:
-
-#### 1. Dependencies
+### 2. Dependencies
 - Issues with no open dependencies first
 - Issues that unblock others prioritized
 
-#### 2. Priority Labels
+### 3. Priority Labels
 - `priority:high` → `priority:medium` → `priority:low`
 
-#### 3. Logical Order
+### 4. Logical Order
 - Foundation (schemas, models) before features
 - Backend before frontend if applicable
-
----
-
-## Listing Milestone Issues
-
-```bash
-# List all open issues in the milestone
-gh issue list --state open --milestone $ARGUMENTS --json number,title,labels,body
-
-# Check for dependencies in issue body (looks for "depends on #X" or "blocked by #X")
-# Parse each issue to build dependency graph
-```
 
 ---
 
 ## Spawning Work Subagent
 
 For each selected issue, spawn a subagent that loads and follows the `work-issue` skill.
+
+This ensures the subagent executes the **exact same logic** as the `/auto-work-issue` command.
 
 ### Task Tool Parameters
 
@@ -204,7 +156,7 @@ Report result clearly:
 - ESCALATED: 'Issue #42 requires human intervention'"
 ```
 
-The subagent loads the same skill that `/work` uses, ensuring identical behavior with isolated context.
+The subagent loads the same skill that `/auto-work-issue` uses, ensuring identical behavior with isolated context.
 
 ---
 
@@ -243,8 +195,7 @@ gh pr comment {PR_NUMBER} --body "**[Product Owner]**
 
 All required reviews complete. Proceeding with merge.
 
-Milestone #{MILESTONE_NUMBER}: {MILESTONE_TITLE}
-Issue {issuesProcessed + 1} of {MILESTONE_TOTAL} in milestone"
+Issue processed: {issuesProcessed + 1} of max {maxIssuesPerRun}"
 
 # Merge
 gh pr merge {PR_NUMBER} --squash --delete-branch
@@ -260,12 +211,10 @@ gh issue view {issue_number} --json state --jq '.state'
 After each issue:
 
 ```
-## Milestone #{MILESTONE_NUMBER}: {MILESTONE_TITLE}
-
 Issue #{number}: [SUCCESS/BLOCKED/ESCALATED]
-Progress: {successCount}/{MILESTONE_TOTAL} issues in milestone complete
-Issues processed this run: {issuesProcessed}/{maxIssuesPerRun}
+Progress: {issuesProcessed}/{maxIssuesPerRun} issues
 Escalations: {escalationCount}/{maxEscalationsBeforeStop}
+Current milestone: [name] - [x/y] complete
 ```
 
 ---
@@ -274,7 +223,7 @@ Escalations: {escalationCount}/{maxEscalationsBeforeStop}
 
 Stop the loop when ANY of these occur:
 
-1. **Milestone complete** → All issues in milestone processed successfully
+1. **All issues complete** → Notify success
 2. **Limit reached** (`maxIssuesPerRun`) → Report progress, suggest continuing later
 3. **Escalation limit** (`maxEscalationsBeforeStop`) → Notify human intervention needed
 4. **Failure limit** (`maxConsecutiveFailures`) → Notify something is wrong
@@ -284,19 +233,19 @@ Stop the loop when ANY of these occur:
 
 ## Completion Notifications
 
-**Milestone complete:**
+**All complete:**
 ```bash
-.claude/hooks/request-attention.sh complete "Milestone #{MILESTONE_NUMBER} ({MILESTONE_TITLE}) complete! All {MILESTONE_TOTAL} issues merged."
+.claude/hooks/request-attention.sh complete "All issues implemented and merged!"
 ```
 
 **Limit reached:**
 ```bash
-.claude/hooks/request-attention.sh info "Processed {n} issues in milestone #{MILESTONE_NUMBER}. Run /work-milestone {MILESTONE_NUMBER} again to continue."
+.claude/hooks/request-attention.sh info "Processed {n} issues. Run /auto-work-all again to continue."
 ```
 
 **Escalation/Failure limit:**
 ```bash
-.claude/hooks/request-attention.sh stuck "Stopped after {n} escalations in milestone #{MILESTONE_NUMBER}. Human intervention needed."
+.claude/hooks/request-attention.sh stuck "Stopped after {n} escalations. Human intervention needed."
 ```
 
 ---
@@ -306,22 +255,20 @@ Stop the loop when ANY of these occur:
 When stopping for any reason:
 
 ```
-## Work-Milestone Summary
+## Work-All Summary
 
-**Milestone:** #{MILESTONE_NUMBER} - {MILESTONE_TITLE}
 **Status:** [Complete / Limit Reached / Stopped - Human Needed]
 
-**Milestone Progress:** {successCount}/{MILESTONE_TOTAL} issues complete
-**Issues Processed This Run:** {issuesProcessed}
+**Issues Processed:** {issuesProcessed}
 **Successful Merges:** {successCount}
 **Blocked:** {blockedCount}
 **Escalated:** {escalatedCount}
 
-**Remaining in Milestone:** {remaining_count}
+**Remaining Open Issues:** {count}
 
 [If applicable: Suggest next steps]
 ```
 
 ---
 
-Begin by validating the milestone number from `$ARGUMENTS`, loading skills, reading limits from settings, then listing all open issues in the milestone.
+Begin by loading skills, reading limits from settings, then listing all open issues.

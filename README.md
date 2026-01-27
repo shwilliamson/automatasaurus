@@ -20,16 +20,16 @@ npx automatasaurus init
 claude
 
 # Begin discovery for a new feature
-/discovery user authentication system
+/auto-discovery user authentication system
 
 # Review and sequence the implementation plan
-/work-plan
+/auto-plan
 
 # Generate agent-specific context files
-/contextualize
+/auto-evolve
 
 # Work through all issues autonomously
-/work-all
+/auto-work-all
 ```
 
 That's it! The framework installs agents, skills, hooks, and slash commands into your project. See [Prerequisites](#prerequisites) for detailed setup instructions.
@@ -47,7 +47,7 @@ The workflow operates in two phases:
 ### Phase 1: Discovery (Interactive)
 
 ```
-User: /discovery "feature description"
+User: /auto-discovery "feature description"
     ↓
 Discovery command facilitates conversation:
   - Goals and success metrics
@@ -66,18 +66,18 @@ Creates GitHub issues with:
     ↓
 User approves milestone/issue breakdown
     ↓
-User: /work-plan (analyze dependencies, create sequence)
+User: /auto-plan (analyze dependencies, create sequence)
     ↓
-User: /contextualize (generate agent-specific context)
+User: /auto-evolve (generate agent-specific context)
     ↓
-User: /work-all
+User: /auto-work-all
 ```
 
 ### Phase 2: Autonomous Loop (Command Orchestrated)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ /work-all ORCHESTRATION LOOP                                        │
+│ /auto-work-all ORCHESTRATION LOOP                                   │
 │                                                                     │
 │ 1. Select next issue                                                │
 │    - Check dependencies (all deps closed?)                         │
@@ -120,12 +120,12 @@ User: /work-all
 | Agent | Model | Role | Responsibilities |
 |-------|-------|------|------------------|
 | **Architect** | Opus | Design | System design, ADRs, required PR reviews, stuck-issue analysis |
-| **Contextualizer** | Sonnet | Preparation | Synthesizes discovery/planning into agent-specific PROJECT.md files |
+| **Evolver** | Sonnet | Preparation | Synthesizes discovery/planning into agent-specific PROJECT.md files |
 | **Developer** | Sonnet | Implementation | Feature development, bug fixes, PRs, addresses feedback |
 | **Designer** | Sonnet | Experience | UI/UX specs, accessibility, design reviews (if UI changes) |
 | **Tester** | Sonnet | Quality | Test execution, Playwright verification, required PR reviews |
 
-**Note:** Commands (`/discovery`, `/work`, `/work-all`) handle orchestration. There is no separate PM agent.
+**Note:** Commands (`/auto-discovery`, `/auto-work-issue`, `/auto-work-all`) handle orchestration. There is no separate PM agent.
 
 ## Agent Comment Format
 
@@ -133,7 +133,7 @@ All agents prefix their comments with their identity:
 
 ```markdown
 **[Product Owner]** Starting work on issue #5. Routing to Developer.
-**[Contextualizer]** Project context generated for all agents.
+**[Evolver]** Project context generated for all agents.
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** ✅ APPROVED - Architect. Clean separation of concerns.
 **[Designer]** N/A - No UI changes in this PR.
@@ -226,7 +226,7 @@ your-project/
 │   ├── README.md                # Framework documentation
 │   ├── agents/                  # AI agents
 │   │   ├── architect/           # Design & required PR reviews
-│   │   ├── contextualizer/      # Agent context generation
+│   │   ├── evolver/             # Agent context generation
 │   │   ├── developer/           # Implementation & PRs
 │   │   ├── designer/            # UI/UX design specs
 │   │   └── tester/              # QA, Playwright, merge authority
@@ -242,12 +242,12 @@ your-project/
 │   │   ├── on-stop.sh
 │   │   └── request-attention.sh
 │   └── commands/                # Slash command definitions
-│       ├── contextualize.md
-│       ├── discovery.md
-│       ├── work.md
-│       ├── work-all.md
-│       ├── work-milestone.md
-│       └── work-plan.md
+│       ├── auto-discovery.md
+│       ├── auto-evolve.md
+│       ├── auto-plan.md
+│       ├── auto-work-all.md
+│       ├── auto-work-issue.md
+│       └── auto-work-milestone.md
 └── .claude/
     ├── settings.json            # Claude Code settings (automatasaurus hooks merged in)
     ├── commands.md              # Project-specific commands (you edit this)
@@ -342,17 +342,17 @@ The primary way to invoke workflows:
 
 | Command | Description |
 |---------|-------------|
-| `/discovery [feature]` | Start discovery to understand requirements and create plan |
-| `/work-plan` | Analyze open issues, create sequenced implementation plan |
-| `/contextualize` | Generate agent-specific PROJECT.md context files |
-| `/work-all` | Work through all open issues autonomously |
-| `/work-milestone [milestone#]` | Work through all issues in a specific milestone |
-| `/work [issue#]` | Work on a specific issue |
+| `/auto-discovery [feature]` | Start discovery to understand requirements and create plan |
+| `/auto-plan` | Analyze open issues, create sequenced implementation plan |
+| `/auto-evolve` | Generate agent-specific PROJECT.md context files |
+| `/auto-work-all` | Work through all open issues autonomously |
+| `/auto-work-milestone [milestone#]` | Work through all issues in a specific milestone |
+| `/auto-work-issue [issue#]` | Work on a specific issue |
 
-### `/discovery` - Discovery Mode
+### `/auto-discovery` - Discovery Mode
 
 ```
-/discovery user authentication system
+/auto-discovery user authentication system
 ```
 
 The discovery command will:
@@ -362,10 +362,10 @@ The discovery command will:
 - Organize issues into milestones
 - Get your approval before any implementation
 
-### `/work-plan` - Implementation Planning
+### `/auto-plan` - Implementation Planning
 
 ```
-/work-plan
+/auto-plan
 ```
 
 Before starting autonomous work, run this command to:
@@ -374,12 +374,12 @@ Before starting autonomous work, run this command to:
 - Generate `implementation-plan.md` with work order and rationale
 - Identify blockers and risks
 
-This step helps you review and approve the execution order before `/work-all` begins.
+This step helps you review and approve the execution order before `/auto-work-all` begins.
 
-### `/contextualize` - Agent Context Generation
+### `/auto-evolve` - Agent Context Generation
 
 ```
-/contextualize
+/auto-evolve
 ```
 
 After planning, run this command to prepare each agent with project-specific guidance:
@@ -392,16 +392,16 @@ After planning, run this command to prepare each agent with project-specific gui
 
 The generated context helps agents make better decisions aligned with your project.
 
-### `/work-all` - Autonomous Loop
+### `/auto-work-all` - Autonomous Loop
 
 ```
-/work-all
+/auto-work-all
 ```
 
 The orchestrator (aka Product Owner) will:
 - List all remaining issues
 - Select next issue based on dependencies and priority
-- Spawn `/work {n}` as a subagent for context isolation
+- Spawn `/auto-work-issue {n}` as a subagent for context isolation
 - Merge successful PRs
 - Continue until all issues complete or circuit breaker limits reached
 
@@ -410,10 +410,10 @@ The orchestrator (aka Product Owner) will:
 - `maxEscalationsBeforeStop`: 3 - Stop if stuck too many times
 - `maxConsecutiveFailures`: 3 - Stop if failing repeatedly
 
-### `/work-milestone` - Milestone-Scoped Work
+### `/auto-work-milestone` - Milestone-Scoped Work
 
 ```
-/work-milestone 3
+/auto-work-milestone 3
 ```
 
 Work through all open issues in a specific GitHub milestone:
@@ -421,17 +421,17 @@ Work through all open issues in a specific GitHub milestone:
 - Lists only issues assigned to that milestone
 - Follows `implementation-plan.md` if it exists (filtered to milestone issues)
 - Otherwise uses dependency/priority ordering within the milestone
-- Same circuit breaker limits as `/work-all`
+- Same circuit breaker limits as `/auto-work-all`
 - Auto-merges successful PRs
 - Reports milestone-specific progress
 - Stops when all issues in the milestone are complete (or limits reached)
 
 Useful when you want to focus on completing a specific release or feature set rather than all open issues.
 
-### `/work` - Single Issue
+### `/auto-work-issue` - Single Issue
 
 ```
-/work 42
+/auto-work-issue 42
 ```
 
 Work on a specific issue - useful for one-off tickets or addressing a particular issue outside the full autonomous loop:

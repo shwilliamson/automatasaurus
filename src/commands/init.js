@@ -142,7 +142,7 @@ Automatasaurus initialized successfully!
 Next steps:
   1. Review CLAUDE.md for framework documentation
   2. Update .claude/commands.md with your project-specific commands
-  3. Start using /discovery, /work, or /work-all commands
+  3. Start using /auto-discovery, /auto-work-issue, or /auto-work-all commands
 
 Run "npx automatasaurus status" to see installation details.
 `);

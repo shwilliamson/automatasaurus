@@ -6,8 +6,8 @@ description: Core implementation logic for working on a single GitHub issue. Use
 # Work Issue Skill
 
 This skill contains the implementation logic for working on a single GitHub issue. It is loaded by:
-- `/work {n}` command (direct invocation)
-- `/work-all` subagents (spawned for context isolation)
+- `/auto-work-issue {n}` command (direct invocation)
+- `/auto-work-all` subagents (spawned for context isolation)
 
 ## Input
 

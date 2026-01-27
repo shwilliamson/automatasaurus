@@ -7,20 +7,20 @@ This project uses Automatasaurus, an automated software development workflow pow
 ### Two-Phase Operation
 
 **Phase 1: Discovery (Interactive)**
-- `/discovery` command facilitates requirements conversation with user
+- `/auto-discovery` command facilitates requirements conversation with user
 - Brings in specialists (Architect, Designer) for review as topics arise
 - Creates GitHub issues organized into milestones
 - User approves before autonomous work begins
 
 **Phase 2: Autonomous Loop (Command Orchestrated)**
-- `/work-all` command selects next issue based on dependencies and priority
+- `/auto-work-all` command selects next issue based on dependencies and priority
 - Routes to Designer for specs if UI work needed
 - Developer implements and opens PR
 - Review cycle: Architect (required), Designer (if UI)
 - Tester verifies, then orchestration merges
 - Loop continues until all issues complete or limits reached
 
-**Note:** Commands (`/discovery`, `/work`, `/work-all`) act as the product owner / orchestrator.
+**Note:** Commands (`/auto-discovery`, `/auto-work-issue`, `/auto-work-all`) act as the product owner / orchestrator.
 
 ### Escalation Flow
 
@@ -48,7 +48,7 @@ The following agents are available in `.claude/agents/`:
 | Agent | Role | Model | Review Status |
 |-------|------|-------|---------------|
 | `architect` | System design, ADRs, stuck-issue analysis, PR review | Opus | **Required** |
-| `contextualizer` | PROJECT.md generation, context synthesis | Sonnet | N/A |
+| `evolver` | PROJECT.md generation, context synthesis | Sonnet | N/A |
 | `designer` | UI/UX specs, accessibility, design review | Sonnet | If UI changes |
 | `developer` | Implementation, PRs, addressing feedback | Sonnet | N/A |
 | `tester` | QA, Playwright, verification | Sonnet | **Required** |
@@ -216,18 +216,19 @@ Primary way to invoke workflows:
 
 | Command | Description |
 |---------|-------------|
-| `/discovery [feature]` | Start discovery to understand requirements and create plan |
-| `/work-plan` | Analyze open issues, create sequenced implementation plan |
-| `/contextualize` | Generate PROJECT.md files for each agent from discovery/planning |
-| `/work-all` | Work through all open issues autonomously |
-| `/work [issue#]` | Work on a specific issue |
+| `/auto-discovery [feature]` | Start discovery to understand requirements and create plan |
+| `/auto-plan` | Analyze open issues, create sequenced implementation plan |
+| `/auto-evolve` | Generate PROJECT.md files for each agent from discovery/planning |
+| `/auto-work-all` | Work through all open issues autonomously |
+| `/auto-work-issue [issue#]` | Work on a specific issue |
+| `/auto-work-milestone [milestone#]` | Work on all issues in a specific milestone |
 
 Examples:
 ```
-/discovery user authentication system
-/work-plan
-/work-all
-/work 42
+/auto-discovery user authentication system
+/auto-plan
+/auto-work-all
+/auto-work-issue 42
 ```
 
 ## Agent Invocation
@@ -247,7 +248,7 @@ Sub-agents start with fresh context - they don't inherit the parent conversation
 
 ### How It Works
 
-When the `/work` or `/work-all` commands spawn agents, they:
+When the `/auto-work-issue` or `/auto-work-all` commands spawn agents, they:
 
 1. **Create a briefing file** with task context and prior agent activity
 2. **Pass the briefing path** in the Task prompt

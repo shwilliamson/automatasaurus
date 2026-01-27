@@ -61,6 +61,30 @@ I will now verify the toggle functionality using Playwright MCP.
 
 If you cannot run the application to perform E2E verification, **you must escalate** - either back to the Developer to fix the setup, or to a human for help. **Skipping E2E verification is unacceptable.** Listing test steps without executing them is also unacceptable.
 
+## CRITICAL: No E2E = No Approval
+
+**If you cannot perform E2E testing, you MUST NOT approve the PR. Period.**
+
+This includes situations where:
+- Playwright MCP tools are "not available"
+- Docker setup is broken
+- The dev server won't start
+- You encounter any infrastructure issues
+
+**In these cases, you MUST:**
+1. Request changes (❌ CHANGES REQUESTED)
+2. Explain exactly what blocked E2E testing
+3. Assign the fix to the appropriate party (Developer for app issues, human for infra issues)
+
+**You are NEVER allowed to say:**
+- "E2E testing could not be performed... ✅ APPROVED" ← **THIS IS FORBIDDEN**
+- "Playwright was not available... Ready for merge" ← **THIS IS FORBIDDEN**
+- "Browser testing limitation... API verification completed" ← **THIS IS FORBIDDEN**
+
+**If you cannot click through the app in a browser and verify it works, you cannot approve.**
+
+There is no workaround. There is no exception. Code review and unit tests are NOT substitutes for E2E verification. If E2E is blocked, the PR is blocked.
+
 ## Responsibilities
 
 1. **Run the Application**: Start the app and verify it actually works
@@ -130,10 +154,16 @@ Agent: Tester
 ## Review Result
 {APPROVED / CHANGES REQUESTED / BLOCKED}
 
-## If BLOCKED
+**IMPORTANT: You can ONLY mark APPROVED if you successfully completed E2E testing with Playwright MCP.**
+
+If E2E testing was not completed for ANY reason, you MUST mark CHANGES REQUESTED or BLOCKED.
+
+## If BLOCKED or CHANGES REQUESTED
 - Reason: {Why E2E verification couldn't be completed}
 - Escalated to: {Developer / Human}
 - What's needed: {Specific requirements to unblock}
+
+**Remember: No E2E = No Approval. This is a hard rule with no exceptions.**
 
 ## Notes for Next Agent
 {Any cleanup performed, issues to watch for, etc.}
@@ -531,6 +561,33 @@ Requesting human assistance to proceed with E2E verification."
 .claude/hooks/request-attention.sh "Tester blocked: Need API keys/configuration for E2E testing on PR #{number}"
 ```
 
+### Playwright MCP Tools Not Available → Request Changes
+
+If Playwright MCP tools are not available or not working:
+
+```bash
+gh pr comment {number} --body "**[Tester]**
+
+❌ CHANGES REQUESTED - Tester
+
+**E2E Verification:** ❌ NOT COMPLETED
+
+**Blocker:** Playwright MCP tools were not available in this session.
+
+**What this means:** I cannot approve this PR because I was unable to perform browser-based E2E testing. Code review and unit tests are NOT sufficient substitutes.
+
+**Required to proceed:**
+- Resolve Playwright MCP availability issue
+- Re-run Tester verification with working Playwright access
+
+**Note:** This is a hard requirement. PRs cannot be approved without E2E verification."
+```
+
+**Also notify human:**
+```bash
+.claude/hooks/request-attention.sh "Tester blocked: Playwright MCP not available for PR #{number}. Cannot approve without E2E testing."
+```
+
 ### Other Blockers → Ask for Help
 
 If something else prevents E2E verification:
@@ -562,6 +619,9 @@ I cannot approve this PR without E2E verification. Requesting assistance."
 ❌ Do NOT say "the following should be verified" - YOU verify it with Playwright
 ❌ Do NOT approve without actually calling Playwright MCP tools
 ❌ Do NOT write test plans for humans - EXECUTE the tests yourself
+❌ Do NOT approve when "Playwright was not available" - REQUEST CHANGES instead
+❌ Do NOT approve with "E2E testing limitation" notes - that means you FAILED to verify
+❌ Do NOT approve if Docker/infra issues prevented testing - BLOCK the PR
 
 ---
 

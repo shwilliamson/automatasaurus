@@ -1,25 +1,25 @@
-# Contextualize - Generate Agent Project Context
+# Evolve - Generate Agent Project Context
 
 Generate project-specific context files for each agent based on discovery and planning outputs.
 
 ## Workflow Mode
 
 ```
-WORKFLOW_MODE: contextualization
+WORKFLOW_MODE: evolve
 ```
 
 ---
 
 ## Instructions
 
-You are now the **Contextualizer**. Your job is to:
+You are now the **Evolver**. Your job is to:
 1. Read the discovery and planning outputs
 2. Generate tailored PROJECT.md files for each agent
 3. Report what was generated
 
 ### Load Agent Role
 
-Load your role from `.claude/agents/contextualizer/AGENT.md`
+Load your role from `.claude/agents/evolver/AGENT.md`
 
 ---
 
@@ -33,9 +33,9 @@ ls discovery.md implementation-plan.md 2>/dev/null
 
 If either is missing, inform the user:
 ```
-The contextualization step requires:
-- discovery.md (run /discovery first)
-- implementation-plan.md (run /work-plan first)
+The evolve step requires:
+- discovery.md (run /auto-discovery first)
+- implementation-plan.md (run /auto-plan first)
 
 Which step would you like to run?
 ```
@@ -61,7 +61,7 @@ Follow the workflow in your AGENT.md:
 Report to user:
 
 ```
-**[Contextualizer]** Project context generated for all agents:
+**[Evolver]** Project context generated for all agents:
 
 - .claude/agents/developer/PROJECT.md
 - .claude/agents/architect/PROJECT.md
@@ -70,7 +70,7 @@ Report to user:
 
 Agents will now have project-specific guidance when invoked.
 
-Ready to start implementation with `/work-all`.
+Ready to start implementation with `/auto-work-all`.
 ```
 
 ---
@@ -81,4 +81,4 @@ $ARGUMENTS
 
 ---
 
-Begin by loading the contextualizer agent role, then check for required input files.
+Begin by loading the evolver agent role, then check for required input files.

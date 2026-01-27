@@ -299,14 +299,14 @@ EOF
 
 When you're ready to start development, run:
 
-/work-plan
+/auto-plan
 
 This will analyze the issues, determine the optimal work order based on dependencies, and create a prioritized implementation plan.
 
 View your milestones and issues at: [GitHub milestone URL]
 ```
 
-**IMPORTANT**: Always recommend `/work-plan` as the primary next step - it helps the user understand the work ahead before diving in.
+**IMPORTANT**: Always recommend `/auto-plan` as the primary next step - it helps the user understand the work ahead before diving in.
 
 ---
 

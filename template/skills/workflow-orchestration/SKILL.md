@@ -15,11 +15,11 @@ Commands run in the main conversation and orchestrate agents:
 
 | Command | Purpose | Produces |
 |---------|---------|----------|
-| `/discovery` | Requirements gathering | `discovery.md`, issues |
-| `/work-plan` | Implementation planning | `implementation-plan.md` |
-| `/contextualize` | Generate agent context | `PROJECT.md` files |
-| `/work {n}` | Single issue | PR (user merges) |
-| `/work-all` | All issues | PRs merged, issues closed |
+| `/auto-discovery` | Requirements gathering | `discovery.md`, issues |
+| `/auto-plan` | Implementation planning | `implementation-plan.md` |
+| `/auto-evolve` | Generate agent context | `PROJECT.md` files |
+| `/auto-work-issue {n}` | Single issue | PR (user merges) |
+| `/auto-work-all` | All issues | PRs merged, issues closed |
 
 ### Agents (Autonomous Workers)
 
@@ -40,10 +40,10 @@ The system operates in different modes:
 
 | Mode | Command | Merge Behavior |
 |------|---------|----------------|
-| `discovery` | `/discovery` | N/A - creates issues |
-| `planning` | `/work-plan` | N/A - creates plan |
-| `single-issue` | `/work {n}` | **Notify only** - user merges |
-| `all-issues` | `/work-all` | **Auto-merge** and continue |
+| `discovery` | `/auto-discovery` | N/A - creates issues |
+| `planning` | `/auto-plan` | N/A - creates plan |
+| `single-issue` | `/auto-work-issue {n}` | **Notify only** - user merges |
+| `all-issues` | `/auto-work-all` | **Auto-merge** and continue |
 
 ### Mode Context Passing
 
@@ -66,7 +66,7 @@ When delegating to agents, include mode context:
 ### Phase 1: Discovery (Interactive)
 
 ```
-User: /discovery "feature description"
+User: /auto-discovery "feature description"
            ↓
     Main conversation facilitates requirements gathering
     (loads requirements-gathering, user-stories skills)
@@ -82,11 +82,11 @@ User: /discovery "feature description"
 ### Phase 2: Implementation (Autonomous)
 
 ```
-User: /work-plan (optional)
+User: /auto-plan (optional)
            ↓
     Analyzes issues, creates implementation-plan.md
            ↓
-User: /work-all
+User: /auto-work-all
            ↓
     LOOP for each issue:
       - Setup orchestration folder
@@ -174,7 +174,7 @@ This enables informed decisions throughout the workflow.
 
 ## PR Done Criteria
 
-Both `/work` and `/work-all` use these criteria to determine when a PR is ready:
+Both `/auto-work-issue` and `/auto-work-all` use these criteria to determine when a PR is ready:
 
 ### Required Approvals
 
@@ -313,10 +313,10 @@ The workflow produces these artifacts:
 
 | File | Command | Purpose |
 |------|---------|---------|
-| `discovery.md` | `/discovery` | Requirements, flows, architecture |
-| `implementation-plan.md` | `/work-plan` | Sequenced work order |
-| `.claude/agents/*/PROJECT.md` | `/contextualize` | Role-specific context |
-| `orchestration/issues/*/` | `/work`, `/work-all` | Briefings and reports per issue |
+| `discovery.md` | `/auto-discovery` | Requirements, flows, architecture |
+| `implementation-plan.md` | `/auto-plan` | Sequenced work order |
+| `.claude/agents/*/PROJECT.md` | `/auto-evolve` | Role-specific context |
+| `orchestration/issues/*/` | `/auto-work-issue`, `/auto-work-all` | Briefings and reports per issue |
 
 ---
 

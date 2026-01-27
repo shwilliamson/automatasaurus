@@ -265,11 +265,11 @@ The full plan is in `implementation-plan.md`.
 
 If you want to generate project-specific context for each agent, run:
 
-`/contextualize`
+`/auto-evolve`
 
 This creates PROJECT.md files in each agent folder with tailored guidance based on discovery and the implementation plan. Recommended for complex projects.
 
-Otherwise, proceed directly to `/work-all`.
+Otherwise, proceed directly to `/auto-work-all`.
 ```
 
 ---
