@@ -630,6 +630,7 @@ Contributions welcome:
 ## Publishing to npm
 
 ```bash
+npm login --auth-type=web
 npm publish --auth-type=web
 ```
 
