@@ -25,17 +25,18 @@ Load your role from `.claude/agents/evolver/AGENT.md`
 
 ## Prerequisites
 
-Before running, verify these files exist:
+Before running, verify planning files exist:
 
 ```bash
-ls discovery.md implementation-plan.md 2>/dev/null
+ls discovery.md discovery-*.md 2>/dev/null
+ls implementation-plan.md implementation-plan-*.md 2>/dev/null
 ```
 
-If either is missing, inform the user:
+If no discovery or plan files are found, inform the user:
 ```
 The evolve step requires:
-- discovery.md (run /auto-discovery first)
-- implementation-plan.md (run /auto-plan first)
+- At least one discovery file (run /auto-discovery first)
+- At least one implementation plan file (run /auto-plan first)
 
 Which step would you like to run?
 ```
@@ -45,9 +46,11 @@ Which step would you like to run?
 ## Execution
 
 Follow the workflow in your AGENT.md:
-1. Read discovery.md and implementation-plan.md
+1. Read ALL discovery files (`discovery.md`, `discovery-*.md`) and ALL plan files (`implementation-plan.md`, `implementation-plan-*.md`)
 2. Check for design-system.md
-3. Generate PROJECT.md for each agent folder:
+3. Fully regenerate PROJECT.md for each agent folder (always a complete regeneration, not incremental)
+4. Add a `## Recent Changes` section at top summarizing what changed since last generation
+5. Generate PROJECT.md for each agent folder:
    - `.claude/agents/developer/PROJECT.md`
    - `.claude/agents/architect/PROJECT.md`
    - `.claude/agents/designer/PROJECT.md`

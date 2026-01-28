@@ -20,7 +20,31 @@ You are now the **Implementation Planner**. Your job is to:
 
 ---
 
+## Phase 0.5: Detect Existing Plan Files
+
+**Before gathering issues, check for prior plan runs:**
+
+```bash
+ls implementation-plan.md implementation-plan-*.md 2>/dev/null
+```
+
+- If **none exist** → this is the first run, will create `implementation-plan.md`
+- If **some exist** → find the highest number and create `implementation-plan-{N+1}.md`
+  - `implementation-plan.md` counts as run 1
+  - `implementation-plan-2.md` is run 2, etc.
+- **Read ALL existing plan files** for context — understand the current dependency graph and what's already been sequenced
+
+---
+
 ## Phase 1: Gather Issues
+
+### Read All Discovery Files
+
+```bash
+ls discovery.md discovery-*.md 2>/dev/null
+```
+
+Read all discovery files (glob `discovery*.md`) for full requirements context.
 
 ### List All Open Issues
 
@@ -143,7 +167,7 @@ Use the Task tool with:
     Return the path to the design document when complete.
 ```
 
-The design system lives in its own file, separate from the implementation plan.
+The design system lives in its own file (`design-system.md`), separate from the implementation plan. It is always updated in place (not numbered). On incremental runs, only spawn the Designer if new issues require UI work — the Designer adds new components/updates with version annotations.
 
 ---
 
@@ -171,7 +195,18 @@ Apply these criteria to determine work order:
 
 ## Phase 5: Create Implementation Plan
 
-Write `implementation-plan.md`:
+Create the plan document:
+
+- **First run**: create `implementation-plan.md`
+- **Subsequent runs**: create `implementation-plan-{N}.md` (e.g., `implementation-plan-2.md`)
+- Subsequent run documents should contain:
+  - Summary of ALL milestones/issues (complete current state)
+  - Work sequence for NEW issues only (not in prior plans)
+  - Updated dependency graph covering all issues (new and old)
+  - `## Prior Plan Context` section referencing previous files
+  - `## Progress Since Last Plan` section noting completed issues
+
+Write the plan document:
 
 ```markdown
 # Implementation Plan

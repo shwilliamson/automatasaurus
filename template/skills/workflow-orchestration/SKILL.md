@@ -15,9 +15,10 @@ Commands run in the main conversation and orchestrate agents:
 
 | Command | Purpose | Produces |
 |---------|---------|----------|
-| `/auto-discovery` | Requirements gathering | `discovery.md`, issues |
-| `/auto-plan` | Implementation planning | `implementation-plan.md` |
-| `/auto-evolve` | Generate agent context | `PROJECT.md` files |
+| `/auto-discovery` | Requirements gathering | `discovery.md` (or `discovery-{N}.md` on re-runs), issues |
+| `/auto-plan` | Implementation planning | `implementation-plan.md` (or `implementation-plan-{N}.md` on re-runs) |
+| `/auto-evolve` | Generate agent context | `PROJECT.md` files (fully regenerated each run) |
+| `/auto-clear` | Remove all generated planning files | Clean slate |
 | `/auto-work-issue {n}` | Single issue | PR (user merges) |
 | `/auto-work-all` | All issues | PRs merged, issues closed |
 
@@ -71,7 +72,7 @@ User: /auto-discovery "feature description"
     Main conversation facilitates requirements gathering
     (loads requirements-gathering, user-stories skills)
            ↓
-    Produces discovery.md
+    Produces discovery.md (or discovery-{N}.md on re-runs)
            ↓
     Spawns Architect → reviews technical feasibility
     Spawns Designer → reviews UI/UX considerations
@@ -84,7 +85,7 @@ User: /auto-discovery "feature description"
 ```
 User: /auto-plan (optional)
            ↓
-    Analyzes issues, creates implementation-plan.md
+    Analyzes issues, creates implementation-plan.md (or implementation-plan-{N}.md on re-runs)
            ↓
 User: /auto-work-all
            ↓
@@ -313,9 +314,10 @@ The workflow produces these artifacts:
 
 | File | Command | Purpose |
 |------|---------|---------|
-| `discovery.md` | `/auto-discovery` | Requirements, flows, architecture |
-| `implementation-plan.md` | `/auto-plan` | Sequenced work order |
-| `.claude/agents/*/PROJECT.md` | `/auto-evolve` | Role-specific context |
+| `discovery.md`, `discovery-{N}.md` | `/auto-discovery` | Requirements, flows, architecture (numbered on re-runs) |
+| `implementation-plan.md`, `implementation-plan-{N}.md` | `/auto-plan` | Sequenced work order (numbered on re-runs) |
+| `design-system.md` | `/auto-plan` | Design language (updated in place) |
+| `.claude/agents/*/PROJECT.md` | `/auto-evolve` | Role-specific context (fully regenerated each run) |
 | `orchestration/issues/*/` | `/auto-work-issue`, `/auto-work-all` | Briefings and reports per issue |
 
 ---

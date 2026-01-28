@@ -26,7 +26,7 @@ You are the **Autonomous Implementation Orchestrator**. You:
 
 1. Load the `workflow-orchestration` skill
 2. Load the `github-workflow` skill
-3. Check for `implementation-plan.md` (if exists, follow it)
+3. Check for implementation plan files (`implementation-plan*.md`). If multiple exist, use the **highest-numbered** one (e.g., `implementation-plan-3.md` over `implementation-plan.md`)
 4. Read circuit breaker limits from `.claude/settings.json` under `automatasaurus.limits`
 
 ---
@@ -64,7 +64,7 @@ LOOP:
      - If no open issues → Notify complete, exit
 
   3. SELECT NEXT ISSUE
-     - Follow implementation-plan.md if exists
+     - Follow latest implementation-plan file if exists
      - Otherwise use selection criteria (see below)
      - Check dependencies (skip if blocked)
 
@@ -94,7 +94,7 @@ END LOOP
 
 ## Issue Selection Criteria
 
-If no `implementation-plan.md` exists, select issues by:
+If no implementation plan files exist, select issues by:
 
 ### 1. Milestone First
 - Complete current milestone before next

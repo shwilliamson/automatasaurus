@@ -28,6 +28,23 @@ Before starting, load:
 
 ---
 
+## Phase 0.5: Detect Existing Discovery Files
+
+**Before anything else, check for prior discovery runs:**
+
+```bash
+ls discovery.md discovery-*.md 2>/dev/null
+```
+
+- If **none exist** → this is the first run, will create `discovery.md`
+- If **some exist** → find the highest number and create `discovery-{N+1}.md`
+  - `discovery.md` counts as run 1
+  - `discovery-2.md` is run 2, etc.
+- **Read ALL existing discovery files** for context — understand what's already been covered
+- Use prior discoveries during Phase 1 to avoid redundant questions and focus on what's new or changed
+
+---
+
 ## Phase 0: Project Orientation
 
 **Before engaging the user, silently orient yourself to the project:**
@@ -128,7 +145,14 @@ Do NOT present all questions at once. Instead:
 
 ## Phase 2: Create Discovery Document
 
-Once requirements are understood, create `discovery.md` in the project:
+Once requirements are understood, create the discovery document:
+
+- **First run**: create `discovery.md`
+- **Subsequent runs**: create `discovery-{N}.md` (e.g., `discovery-2.md`, `discovery-3.md`)
+- Subsequent run documents should be scoped to **new features only**
+- Add a `## Prior Discovery Context` section at the top referencing previous files (e.g., "This builds on requirements from discovery.md")
+
+Create the document in the project:
 
 ```markdown
 # Discovery: [Feature/Project Name]
@@ -250,7 +274,8 @@ gh api repos/{owner}/{repo}/milestones \
 Use the `github-issues` skill for proper formatting.
 
 Each issue should:
-- Reference the discovery document
+- Reference the **current** discovery document (not prior ones)
+- Only create issues from requirements in the CURRENT discovery document
 - Include user story format
 - Have clear acceptance criteria
 - Document dependencies
@@ -265,7 +290,7 @@ gh issue create \
   --label "ready" \
   --body "$(cat <<'EOF'
 ## Context
-From discovery: [link to discovery.md]
+From discovery: [link to current discovery file, e.g., discovery.md or discovery-2.md]
 
 ## User Story
 As a [user],
