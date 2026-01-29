@@ -1,6 +1,6 @@
 {
   "name": "automatasaurus",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Automated software development workflow powered by Claude Code",
   "type": "module",
   "bin": {
