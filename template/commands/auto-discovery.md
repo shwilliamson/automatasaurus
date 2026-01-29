@@ -282,13 +282,10 @@ Each issue should:
 - Be sized for a single PR
 - **No type prefix in title** (e.g., "Feature:", "Bug:") - use labels instead
 
+**Important:** Don't use heredocs (`<<EOF`) with `gh` commands - they fail in sandboxed environments. Instead, use the Write tool to create a temp file, then `--body-file`:
+
 ```bash
-gh issue create \
-  --title "[Concise description]" \
-  --milestone "[Milestone Name]" \
-  --label "feature" \
-  --label "ready" \
-  --body "$(cat <<'EOF'
+# Step 1: Use Write tool to create .github-issue-body.md with:
 ## Context
 From discovery: [link to current discovery file, e.g., discovery.md or discovery-2.md]
 
@@ -309,8 +306,17 @@ So that [benefit].
 
 ## Out of Scope
 [What's NOT included]
-EOF
-)"
+
+# Step 2: Create the issue
+gh issue create \
+  --title "[Concise description]" \
+  --milestone "[Milestone Name]" \
+  --label "feature" \
+  --label "ready" \
+  --body-file .github-issue-body.md
+
+# Step 3: Clean up
+rm .github-issue-body.md
 ```
 
 ---

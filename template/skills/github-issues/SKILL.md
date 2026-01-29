@@ -87,6 +87,20 @@ gh issue edit {number} --milestone "v1.0 - Basic Cart"
 
 ## Issue Commands
 
+### Sandbox Compatibility (Important)
+
+**Don't use heredocs (`<<EOF`) with `gh` commands** - they fail in sandboxed environments because the shell can't create temp files for the heredoc content.
+
+Instead, use the Write tool + `--body-file` pattern:
+
+```bash
+# 1. Use Write tool to create .github-issue-body.md with the issue body
+# 2. Create the issue with --body-file
+gh issue create --title "..." --body-file .github-issue-body.md
+# 3. Clean up
+rm .github-issue-body.md
+```
+
 ### Before Creating an Issue
 
 **Always check for duplicates first:**

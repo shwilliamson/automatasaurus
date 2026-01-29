@@ -7,6 +7,20 @@ description: Best practices for writing clear, effective pull request descriptio
 
 Guidelines for writing pull request descriptions that help reviewers understand and approve changes quickly.
 
+## Creating PRs (Sandbox Compatibility)
+
+**Don't use heredocs (`<<EOF`) with `gh pr create`** - they fail in sandboxed environments.
+
+Use the Write tool + `--body-file` pattern:
+
+```bash
+# 1. Use Write tool to create .github-pr-body.md with your PR body
+# 2. Create the PR
+gh pr create --title "#42 feat: Add user auth" --body-file .github-pr-body.md
+# 3. Clean up
+rm .github-pr-body.md
+```
+
 ## PR Title Format
 
 ```

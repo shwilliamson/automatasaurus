@@ -249,10 +249,11 @@ Load the `pr-writing` skill for detailed guidance.
 
 **Creating the PR:**
 
+Use Write tool + `--body-file` (heredocs fail in sandboxed environments):
+
 ```bash
-gh pr create \
-  --title "#{issue} feat: {description}" \
-  --body "**[Developer]**
+# Step 1: Use Write tool to create .github-pr-body.md with:
+**[Developer]**
 
 ## Summary
 {Description}
@@ -265,7 +266,15 @@ Closes #{issue_number}
 - [ ] Tester
 
 ## Testing
-- [x] Tests passing"
+- [x] Tests passing
+
+# Step 2: Create the PR
+gh pr create \
+  --title "#{issue} feat: {description}" \
+  --body-file .github-pr-body.md
+
+# Step 3: Clean up
+rm .github-pr-body.md
 ```
 
 After creating, update issue:
