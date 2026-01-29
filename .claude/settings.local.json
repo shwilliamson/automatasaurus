@@ -13,7 +13,8 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(grep:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "WebFetch(domain:www.jetbrains.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

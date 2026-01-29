@@ -22,6 +22,7 @@ automatasaurus/
 │   ├── CLAUDE.block.md     # Core framework docs (block-merged)
 │   ├── commands.block.md   # Framework commands (block-merged)
 │   ├── settings.json       # Claude Code settings with hooks
+│   ├── mcp.json            # MCP server config (Playwright)
 │   ├── commands/           # Slash command definitions
 │   ├── agents/             # Specialized personas (PM, Developer, Architect, etc.)
 │   ├── skills/             # Reusable knowledge modules
@@ -136,6 +137,7 @@ cat CLAUDE.md
 | `CLAUDE.block.md` | Block-merge into CLAUDE.md |
 | `commands.block.md` | Block-merge into commands.md |
 | `settings.json` | Layered merge (framework defaults + user's `settings.local.json`) |
+| `mcp.json` | Deep merge into `.mcp.json` (preserves existing MCP servers) |
 | `commands/*.md` | Direct copy |
 | `agents/*/AGENT.md` | Direct copy |
 | `skills/*/SKILL.md` | Direct copy |

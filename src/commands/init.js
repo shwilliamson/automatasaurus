@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { getTemplateDir, getProjectPaths, getVersion, SUBDIR_SYMLINK_DIRS, FILE_SYMLINK_DIRS } from '../lib/paths.js';
 import { symlinkDirectory, symlinkSubdirectories } from '../lib/symlinks.js';
 import { mergeBlockIntoFile } from '../lib/block-merge.js';
-import { mergeLayeredSettings, createLocalSettingsTemplate } from '../lib/json-merge.js';
+import { mergeLayeredSettings, createLocalSettingsTemplate, mergeJsonFile } from '../lib/json-merge.js';
 import { readManifest, writeManifest, createManifest, updateManifest } from '../lib/manifest.js';
 
 export async function init({ force = false } = {}) {
@@ -114,7 +114,20 @@ export async function init({ force = false } = {}) {
     console.log('  No settings template found, skipping');
   }
 
-  // 6. Block-merge commands.md
+  // 6. Merge MCP config
+  console.log('\nMerging MCP config...');
+  const mcpTemplate = join(templateDir, 'mcp.json');
+  try {
+    const mcpContent = await readFile(mcpTemplate, 'utf-8');
+    const frameworkMcp = JSON.parse(mcpContent);
+    const result = await mergeJsonFile(paths.mcp, frameworkMcp);
+    console.log(`  ${result.created ? 'Created' : 'Updated'} .mcp.json`);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    console.log('  No MCP template found, skipping');
+  }
+
+  // 7. Block-merge commands.md
   console.log('\nMerging commands.md...');
   const commandsTemplate = join(templateDir, 'commands.block.md');
   try {
@@ -126,7 +139,7 @@ export async function init({ force = false } = {}) {
     console.log('  No commands.md template found, skipping');
   }
 
-  // 7. Write manifest
+  // 8. Write manifest
   const manifest = createManifest(version);
   manifest.symlinks = allSymlinks;
   manifest.merged_blocks = [

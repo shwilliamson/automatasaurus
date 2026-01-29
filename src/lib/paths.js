@@ -39,6 +39,7 @@ export function getProjectPaths(projectRoot) {
     settings: join(projectRoot, '.claude', 'settings.json'),
     settingsLocal: join(projectRoot, '.claude', 'settings.local.json'),
     commands: join(projectRoot, '.claude', 'commands.md'),
+    mcp: join(projectRoot, '.mcp.json'),
   };
 }
 

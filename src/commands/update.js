@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { getTemplateDir, getProjectPaths, getVersion, SUBDIR_SYMLINK_DIRS, FILE_SYMLINK_DIRS } from '../lib/paths.js';
 import { symlinkDirectory, symlinkSubdirectories } from '../lib/symlinks.js';
 import { mergeBlockIntoFile } from '../lib/block-merge.js';
-import { mergeLayeredSettings, createLocalSettingsTemplate } from '../lib/json-merge.js';
+import { mergeLayeredSettings, createLocalSettingsTemplate, mergeJsonFile } from '../lib/json-merge.js';
 import { readManifest, writeManifest, updateManifest } from '../lib/manifest.js';
 import { getDeprecatedPaths } from '../lib/migrations.js';
 
@@ -153,6 +153,17 @@ export async function update({ force = false } = {}) {
     const blockContent = await readFile(commandsTemplate, 'utf-8');
     await mergeBlockIntoFile(paths.commands, 'COMMANDS', blockContent);
     console.log('  Updated commands.md');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+
+  // .mcp.json
+  const mcpTemplate = join(templateDir, 'mcp.json');
+  try {
+    const mcpContent = await readFile(mcpTemplate, 'utf-8');
+    const frameworkMcp = JSON.parse(mcpContent);
+    await mergeJsonFile(paths.mcp, frameworkMcp);
+    console.log('  Updated .mcp.json');
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
