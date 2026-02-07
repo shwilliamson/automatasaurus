@@ -9,43 +9,18 @@ Guidelines for performing effective code reviews that catch issues, improve code
 
 ## Review Mindset
 
-### Bias Towards Shipping
-
-**The primary goal is to get working code merged, not to achieve perfection.**
-
-Before requesting changes, always ask yourself:
-> "Is this feedback worth an additional review cycle?"
-
-Most feedback should be:
-- Approved with suggestions for the author to consider
-- Comments for future reference, not blocking
-- Follow-up issues for later improvement
-
-**Reserve "Request Changes" for actual problems:**
-- Security vulnerabilities
-- Bugs that will cause runtime errors
-- Breaking changes to existing functionality
-- Missing critical requirements
-
-**Do NOT block for:**
-- Style preferences (unless egregiously inconsistent)
-- "I would have done it differently"
-- Minor optimizations that don't matter at current scale
-- Missing tests for edge cases that are unlikely
-- Refactoring opportunities (create a follow-up issue instead)
+Don't hold up PRs over trivial issues — but do request changes for anything substantive.
 
 ### Goals of Code Review
 1. **Catch real bugs** before they reach production
 2. **Prevent security issues** - the things that actually matter
 3. **Share knowledge** across the team
-4. **Ship working software** - don't let perfect be the enemy of good
 
 ### The Right Attitude
 - You're reviewing the **code**, not the person
 - Assume good intent - the author tried their best
 - Be a collaborator, not a gatekeeper
 - Your job is to help ship good code, not to find fault
-- **Velocity matters** - every review cycle has a cost
 
 ## Review Process
 
@@ -246,8 +221,6 @@ Use prefixes to indicate importance:
 | **Question:** | Seeking to understand | As needed |
 | **Praise:** | Something done well | Often! |
 
-**Important:** Most comments should be Suggestions or Nits, not Blockers. If you find yourself writing many Blockers, reconsider whether they truly block shipping.
-
 ```markdown
 **Blocker:** This SQL query is vulnerable to injection. (Security - must fix)
 
@@ -269,18 +242,6 @@ Use prefixes to indicate importance:
 > Have you considered using a Map here? It might give better performance for frequent lookups. What do you think?
 
 ## Common Review Scenarios
-
-### When You'd Do It Differently
-
-Don't block for preference. Ask yourself:
-- Is their way wrong, or just different?
-- Does it work correctly?
-- Is it maintainable?
-
-If it's just different:
-```markdown
-**Note:** I might have used X approach here, but this works well too. Not blocking.
-```
 
 ### When Something Is Missing
 
@@ -305,49 +266,32 @@ Don't just point out problems:
 
 ## Review Response Templates
 
-**Default to Approve.** Most reviews should approve, possibly with suggestions.
-
-### Approve (Most Common)
+### Approve
 ```markdown
 **[Architect]** LGTM! Clean implementation, good test coverage.
 
-Minor suggestions (not blocking):
+Suggestions:
 - Line 42: prefer const
 - Consider adding a comment explaining the retry logic
-
-Merging as-is is fine. Address these if you agree, or not - your call.
 ```
 
 ### Approve with Suggestions
 ```markdown
-**[Architect]** Approving - this is solid work.
+**[Architect]** Approving with a few suggestions:
 
-A few things to consider (can address now or in follow-up):
 1. The validation could be more specific about what's wrong
 2. Consider adding logging for debugging
-
-Not blocking merge. Ship it!
 ```
 
-### Request Changes (Rare - Use Sparingly)
-
-**Only use for genuine blockers: security issues, bugs, or missing critical functionality.**
-
+### Request Changes
 ```markdown
-**[Architect]** Good progress! Found one issue that needs fixing before merge:
+**[Architect]** Found an issue that needs fixing before merge:
 
 **Blocker:**
 1. SQL injection vulnerability in the search query - this is a security risk
 
 Everything else looks good. Happy to re-review once the security fix is in.
 ```
-
-**Ask yourself before requesting changes:**
-- Will this cause a production incident if shipped?
-- Is this a security vulnerability?
-- Does it break existing functionality?
-
-If the answer to all three is "no", consider approving with suggestions instead.
 
 ### Decline (N/A)
 ```markdown
@@ -368,7 +312,6 @@ Reviewed: Backend/infrastructure changes only, no user-facing impact.
 ### Don't
 - Nitpick excessively
 - Bike-shed on minor style issues
-- Block for preferences
 - Be condescending
 - Leave reviews hanging
 

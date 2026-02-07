@@ -98,22 +98,6 @@ Provide structured feedback:
 
 Load the `code-review` skill for detailed guidance.
 
-### Review Philosophy
-
-Have a **slight bias towards moving forward** - avoid nitpicks and style debates that slow down shipping. But still request changes for legitimate problems.
-
-**Request changes for:**
-- Security vulnerabilities
-- Bugs that will cause runtime errors
-- Breaking existing functionality
-- Missing critical requirements
-- Significant architectural issues
-
-**Don't block for (suggest as non-blocking instead):**
-- Style preferences
-- Minor refactoring opportunities (create follow-up issue)
-- Nitpicks that don't affect functionality
-
 ### Review Process
 
 ```bash
