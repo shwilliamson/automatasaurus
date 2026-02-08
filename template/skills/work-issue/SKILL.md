@@ -168,7 +168,7 @@ Post design specifications as an issue comment following your AGENT.md template,
 ```
 Use the Task tool with:
   subagent_type: "designer"
-  model: "opus"
+  model: "sonnet"
   description: "Designer specs for issue #{ISSUE_NUMBER}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md first.
@@ -226,7 +226,7 @@ Implement issue #{ISSUE_NUMBER}: {title}
 ```
 Use the Task tool with:
   subagent_type: "developer"
-  model: "opus"
+  model: "sonnet"
   description: "Implement issue #{ISSUE_NUMBER}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md first.
@@ -342,7 +342,7 @@ Spawn all reviewers in parallel (single message, multiple Task calls):
 # Architect review
 Use the Task tool with:
   subagent_type: "architect"
-  model: "opus"
+  model: "sonnet"
   description: "Architect review PR #{pr_number}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-architect-review.md first.
@@ -353,7 +353,7 @@ Use the Task tool with:
 # Designer review (if UI)
 Use the Task tool with:
   subagent_type: "designer"
-  model: "opus"
+  model: "sonnet"
   description: "Designer review PR #{pr_number}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-designer-review.md first.
@@ -364,7 +364,7 @@ Use the Task tool with:
 # Tester verification
 Use the Task tool with:
   subagent_type: "tester"
-  model: "opus"
+  model: "sonnet"
   description: "Tester verify PR #{pr_number}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-test.md first.
@@ -428,7 +428,7 @@ Address review feedback on PR #{pr_number}.
 ```
 Use the Task tool with:
   subagent_type: "developer"
-  model: "opus"
+  model: "sonnet"
   description: "Address feedback PR #{pr_number}"
   prompt: |
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-address-feedback.md first.

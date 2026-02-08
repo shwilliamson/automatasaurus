@@ -225,7 +225,7 @@ After creating discovery.md, get feedback from specialist agents:
 ```
 Use the Task tool with:
   subagent_type: "architect"
-  model: "opus"
+  model: "sonnet"
   description: "Architect review discovery plan"
   prompt: |
     Review this discovery plan for technical feasibility.
@@ -237,7 +237,7 @@ Use the Task tool with:
 ```
 Use the Task tool with:
   subagent_type: "designer"
-  model: "opus"
+  model: "sonnet"
   description: "Designer review discovery plan"
   prompt: |
     Review this discovery plan for UI/UX considerations.

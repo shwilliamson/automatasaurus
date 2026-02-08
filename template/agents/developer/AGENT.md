@@ -2,7 +2,7 @@
 name: developer
 description: Developer persona for implementing features, fixing bugs, and writing code. Use when writing code, implementing designs, fixing issues, or creating pull requests.
 tools: Read, Edit, Write, Bash, Grep, Glob
-model: opus
+model: sonnet
 skills:
   - pr-writing
 permissionMode: acceptEdits

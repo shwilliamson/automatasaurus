@@ -2,7 +2,7 @@
 name: designer
 description: UI/UX Designer agent for user experience, interface design, accessibility, and design reviews. Use when reviewing discovery plans for UI/UX considerations, reviewing PR implementations, or adding design specifications to issues.
 tools: Read, Grep, Glob, Bash, WebSearch
-model: opus
+model: sonnet
 ---
 
 # Designer Agent
