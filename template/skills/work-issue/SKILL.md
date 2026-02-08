@@ -167,12 +167,10 @@ Post design specifications as an issue comment following your AGENT.md template,
 
 ```
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "designer"
+  model: "opus"
   description: "Designer specs for issue #{ISSUE_NUMBER}"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md first.
 
     After completing your work, write your report to:
@@ -227,12 +225,10 @@ Implement issue #{ISSUE_NUMBER}: {title}
 
 ```
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "developer"
+  model: "opus"
   description: "Implement issue #{ISSUE_NUMBER}"
   prompt: |
-    You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md first.
 
     After completing your work, write your report to:
@@ -345,12 +341,10 @@ Spawn all reviewers in parallel (single message, multiple Task calls):
 ```
 # Architect review
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "architect"
+  model: "opus"
   description: "Architect review PR #{pr_number}"
   prompt: |
-    You are the Architect agent. Load your role from .claude/agents/architect/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-architect-review.md first.
 
     After completing your review, write your report to:
@@ -358,12 +352,10 @@ Use the Task tool with:
 
 # Designer review (if UI)
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "designer"
+  model: "opus"
   description: "Designer review PR #{pr_number}"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-designer-review.md first.
 
     After completing your review, write your report to:
@@ -371,12 +363,10 @@ Use the Task tool with:
 
 # Tester verification
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "tester"
+  model: "opus"
   description: "Tester verify PR #{pr_number}"
   prompt: |
-    You are the Tester agent. Load your role from .claude/agents/tester/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-test.md first.
 
     After completing verification, write your report to:
@@ -437,12 +427,10 @@ Address review feedback on PR #{pr_number}.
 
 ```
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "developer"
+  model: "opus"
   description: "Address feedback PR #{pr_number}"
   prompt: |
-    You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
-
     Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-address-feedback.md first.
 
     After completing fixes, write your report to:

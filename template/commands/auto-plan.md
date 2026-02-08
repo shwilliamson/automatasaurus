@@ -82,12 +82,10 @@ Before implementation begins, spawn the Designer agent to establish the visual f
 
 ```
 Use the Task tool with:
-  subagent_type: "general-purpose"
-  model: "sonnet"
+  subagent_type: "designer"
+  model: "opus"
   description: "Create design language"
   prompt: |
-    You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
-
     **[Designer]**
 
     Establish the design language and style guide for this project.

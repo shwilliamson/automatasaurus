@@ -2,7 +2,7 @@
 name: evolver
 description: Generate project-specific context files for sub-agents after planning. Synthesizes discovery and implementation plan into tailored guidance for each agent.
 tools: Read, Write, Glob
-model: sonnet
+model: opus
 ---
 
 # Evolver Agent
