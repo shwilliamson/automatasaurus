@@ -1,4 +1,4 @@
-import { symlink, unlink, readlink, mkdir, readdir, stat } from 'node:fs/promises';
+import { symlink, unlink, readlink, mkdir, readdir, stat, access } from 'node:fs/promises';
 import { join, dirname, relative } from 'node:path';
 
 /**
@@ -116,6 +116,46 @@ export async function symlinkSubdirectories(sourceDir, targetDir) {
 
       await createSymlink(source, target);
       created.push(entry.name);
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
+  return created;
+}
+
+/**
+ * Create flat file symlinks for agent AGENT.md files.
+ * For each agent subdirectory containing AGENT.md, creates:
+ *   targetDir/{name}.md -> sourceDir/{name}/AGENT.md
+ *
+ * This enables Claude Code's flat-file agent discovery while
+ * preserving subdirectory symlinks for PROJECT.md support.
+ */
+export async function symlinkAgentFiles(sourceDir, targetDir) {
+  await mkdir(targetDir, { recursive: true });
+
+  const created = [];
+
+  try {
+    const entries = await readdir(sourceDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+
+      const agentMdPath = join(sourceDir, entry.name, 'AGENT.md');
+
+      try {
+        await access(agentMdPath);
+      } catch {
+        continue; // No AGENT.md in this subdirectory
+      }
+
+      const target = join(targetDir, `${entry.name}.md`);
+      await createSymlink(agentMdPath, target);
+      created.push(`${entry.name}.md`);
     }
   } catch (error) {
     if (error.code !== 'ENOENT') {

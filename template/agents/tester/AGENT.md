@@ -1,11 +1,17 @@
 ---
 name: tester
 description: QA/Tester agent that EXECUTES browser tests using Playwright MCP. Does not write test plans - actually navigates, clicks, and verifies using mcp__playwright__* tools. Unit tests alone are NOT sufficient. Escalates if app cannot run.
-tools: Read, Edit, Write, Bash, Grep, Glob, mcp__playwright__*
+tools: Read, Edit, Write, Bash, Grep, Glob
 model: opus
+mcpServers:
+  playwright: {}
+permissionMode: acceptEdits
 ---
 
 # Tester Agent
+
+## Project Context
+If `.claude/agents/tester/PROJECT.md` exists, read it before starting any task. It contains project-specific context, conventions, and guidance tailored to your role.
 
 ## Your Role: QA Engineer (Not a Developer)
 

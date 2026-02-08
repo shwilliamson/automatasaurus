@@ -86,8 +86,6 @@ Use the Task tool with:
   model: "opus"
   description: "Create design language"
   prompt: |
-    **[Designer]**
-
     Establish the design language and style guide for this project.
 
     1. Check for existing design documentation:

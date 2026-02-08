@@ -223,16 +223,26 @@ After creating discovery.md, get feedback from specialist agents:
 
 ### Architect Review
 ```
-Use the architect agent to review this discovery plan for technical feasibility.
-Focus on: architecture fit, scalability, security implications, technology choices.
-The discovery plan is at: [path to discovery.md]
+Use the Task tool with:
+  subagent_type: "architect"
+  model: "opus"
+  description: "Architect review discovery plan"
+  prompt: |
+    Review this discovery plan for technical feasibility.
+    Focus on: architecture fit, scalability, security implications, technology choices.
+    The discovery plan is at: [path to discovery.md]
 ```
 
 ### Designer Review
 ```
-Use the designer agent to review this discovery plan for UI/UX considerations.
-Focus on: user flows, accessibility, responsive design, missing UI requirements.
-The discovery plan is at: [path to discovery.md]
+Use the Task tool with:
+  subagent_type: "designer"
+  model: "opus"
+  description: "Designer review discovery plan"
+  prompt: |
+    Review this discovery plan for UI/UX considerations.
+    Focus on: user flows, accessibility, responsive design, missing UI requirements.
+    The discovery plan is at: [path to discovery.md]
 ```
 
 Present the feedback to the user. Refine the discovery document based on feedback.

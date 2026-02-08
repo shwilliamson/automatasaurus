@@ -48,10 +48,10 @@ The following agents are available in `.claude/agents/`:
 | Agent | Role | Model | Review Status |
 |-------|------|-------|---------------|
 | `architect` | System design, ADRs, stuck-issue analysis, PR review | Opus | **Required** |
-| `evolver` | PROJECT.md generation, context synthesis | Sonnet | N/A |
-| `designer` | UI/UX specs, accessibility, design review | Sonnet | If UI changes |
-| `developer` | Implementation, PRs, addressing feedback | Sonnet | N/A |
-| `tester` | QA, Playwright, verification | Sonnet | **Required** |
+| `evolver` | PROJECT.md generation, context synthesis | Opus | N/A |
+| `designer` | UI/UX specs, accessibility, design review | Opus | If UI changes |
+| `developer` | Implementation, PRs, addressing feedback | Opus | N/A |
+| `tester` | QA, Playwright, verification | Opus | **Required** |
 
 **Note:** Commands handle orchestration. Agents are autonomous workers invoked by commands.
 
@@ -255,7 +255,7 @@ When the `/auto-work-issue` or `/auto-work-all` commands spawn agents, they:
 3. **Read the agent's report** after the Task returns
 4. **Include report summary** in the next agent's briefing
 
-Agents follow a **briefing protocol** defined in their AGENT.md files:
+Claude Code auto-loads each agent's system prompt from `.claude/agents/{name}.md` when spawned with matching `subagent_type`. Agents follow a **briefing protocol**:
 1. Read the briefing file first
 2. Do their work
 3. Write a report before completing

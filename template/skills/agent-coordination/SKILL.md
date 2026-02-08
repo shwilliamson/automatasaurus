@@ -216,9 +216,8 @@ Agent: {role}
    - PR created with "Closes #{number}"
 
 3. Use Task tool with:
+   subagent_type: "developer"
    prompt: |
-     You are the Developer agent. Load your role from .claude/agents/developer/AGENT.md
-
      Read orchestration/issues/{number}-{slug}/BRIEFING-implement.md first.
 
      After completing your work, write your report to:
@@ -254,9 +253,8 @@ Agent: {role}
    - OR ❌ CHANGES REQUESTED - Architect
 
 2. Use Task tool with:
+   subagent_type: "architect"
    prompt: |
-     You are the Architect agent. Load your role from .claude/agents/architect/AGENT.md
-
      Read orchestration/issues/{number}-{slug}/BRIEFING-architect-review.md first.
 
      After completing your review, write your report to:
@@ -286,9 +284,8 @@ Agent: {role}
    Post design specifications as issue comment following AGENT.md template.
 
 2. Use Task tool with:
+   subagent_type: "designer"
    prompt: |
-     You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
-
      Read orchestration/issues/{number}-{slug}/BRIEFING-design-specs.md first.
 
      After completing your specs, write your report to:
@@ -324,9 +321,8 @@ Agent: {role}
    - OR N/A - No UI changes
 
 2. Use Task tool with:
+   subagent_type: "designer"
    prompt: |
-     You are the Designer agent. Load your role from .claude/agents/designer/AGENT.md
-
      Read orchestration/issues/{number}-{slug}/BRIEFING-designer-review.md first.
 
      After completing your review, write your report to:
@@ -362,9 +358,8 @@ Agent: {role}
    - OR ❌ CHANGES REQUESTED - Tester
 
 2. Use Task tool with:
+   subagent_type: "tester"
    prompt: |
-     You are the Tester agent. Load your role from .claude/agents/tester/AGENT.md
-
      Read orchestration/issues/{number}-{slug}/BRIEFING-test.md first.
 
      After completing verification, write your report to:

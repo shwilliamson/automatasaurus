@@ -1,7 +1,7 @@
 import { mkdir, cp, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getTemplateDir, getProjectPaths, getVersion, SUBDIR_SYMLINK_DIRS, FILE_SYMLINK_DIRS } from '../lib/paths.js';
-import { symlinkDirectory, symlinkSubdirectories } from '../lib/symlinks.js';
+import { symlinkDirectory, symlinkSubdirectories, symlinkAgentFiles } from '../lib/symlinks.js';
 import { mergeBlockIntoFile } from '../lib/block-merge.js';
 import { mergeLayeredSettings, createLocalSettingsTemplate, mergeJsonFile } from '../lib/json-merge.js';
 import { readManifest, writeManifest, createManifest, updateManifest } from '../lib/manifest.js';
@@ -56,6 +56,21 @@ export async function init({ force = false } = {}) {
         const symlinkPath = `${dir}/${subdir}`;
         allSymlinks.push(symlinkPath);
         console.log(`  Linked ${symlinkPath}/`);
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
+
+  // Flat file symlinks for agents (enables Claude Code agent discovery)
+  {
+    const sourceDir = join(paths.automatasaurus, 'agents');
+    const targetDir = join(paths.claude, 'agents');
+    try {
+      const created = await symlinkAgentFiles(sourceDir, targetDir);
+      for (const file of created) {
+        allSymlinks.push(`agents/${file}`);
+        console.log(`  Linked agents/${file}`);
       }
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
