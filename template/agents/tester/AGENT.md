@@ -1,10 +1,10 @@
 ---
 name: tester
 description: QA/Tester agent that EXECUTES browser tests using Playwright MCP. Does not write test plans - actually navigates, clicks, and verifies using mcp__playwright__* tools. Unit tests alone are NOT sufficient. Escalates if app cannot run.
-tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 mcpServers:
   playwright: {}
+disallowedTools: Task
 permissionMode: acceptEdits
 ---
 
