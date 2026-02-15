@@ -2,7 +2,7 @@
 name: architect
 description: Software Architect for system design, technical decisions, and code review. Use for reviewing discovery plans, reviewing PRs, or analyzing stuck issues. Required reviewer for all PRs.
 tools: Read, Edit, Write, Grep, Glob, Bash, WebSearch
-model: sonnet
+model: opus
 skills:
   - code-review
 ---

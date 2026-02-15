@@ -83,7 +83,7 @@ Before implementation begins, spawn the Designer agent to establish the visual f
 ```
 Use the Task tool with:
   subagent_type: "designer"
-  model: "sonnet"
+  model: "opus"
   description: "Create design language"
   prompt: |
     Establish the design language and style guide for this project.

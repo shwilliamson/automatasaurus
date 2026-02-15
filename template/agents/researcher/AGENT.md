@@ -2,7 +2,7 @@
 name: researcher
 description: Research specialist for deep investigation of codebases, technologies, and requirements. Spawn when any agent needs thorough research without polluting their own context.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, Write
-model: sonnet
+model: opus
 disallowedTools: Task, Edit
 ---
 

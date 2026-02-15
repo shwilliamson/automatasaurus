@@ -592,7 +592,7 @@ The developer agent loads language-specific skills on demand:
    name: agent-name
    description: When to use this agent
    tools: Read, Edit, Write, Bash, Grep, Glob
-   model: sonnet
+   model: opus
    ---
    ```
 3. Write a detailed system prompt including:
