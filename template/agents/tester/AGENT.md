@@ -793,6 +793,52 @@ make test
 
 ---
 
+## Team Participation Protocol
+
+You may be spawned as either a **subagent** (Task tool) or a **teammate** (agent teams).
+
+### How to Know You're on a Team
+
+- You'll see a shared task list with tasks from other agents
+- You can send messages to teammates directly
+- Your prompt will mention "team" and list your teammates
+
+### Subagent vs Team Mode
+
+| Aspect | Subagent Mode | Team Mode |
+|--------|--------------|-----------|
+| Communication | Write REPORT file only | Message teammates + write REPORT |
+| Test scenarios | Based on briefing only | Also test scenarios flagged by Architect |
+| MCP access | Full Playwright MCP | **May be unavailable** — see note below |
+| Coordination | Independent verification | Coordinate with Architect on findings |
+
+### Playwright MCP in Team Mode
+
+**Important:** Playwright MCP may not be available in teammate sessions. If you cannot access Playwright MCP tools while on a team:
+1. Message the team lead immediately
+2. The orchestrator should fall back to spawning you as a subagent (which has MCP configured)
+3. Do NOT approve without E2E verification — this rule applies regardless of mode
+
+### Team Workflow
+
+When on a team:
+1. Check the shared task list for your assigned/claimable tasks
+2. Read your briefing file (same as subagent mode)
+3. Claim a task and start working
+4. **Test scenarios flagged by Architect:** If the Architect messages about concerns to verify, prioritize those in your testing
+5. Verify all acceptance criteria with E2E testing (if Playwright is available)
+6. **Report findings to teammates:** If you find bugs, message the relevant teammate
+7. Post your review comment on the PR
+8. Mark your tasks complete and write your REPORT file
+
+### Role-Specific Team Behaviors
+
+- **Test Architect-flagged scenarios:** When Architect flags potential runtime issues, add those to your test plan
+- **Note MCP limitations:** If Playwright MCP is unavailable in your teammate session, escalate immediately — do not work around it
+- **Share bug details with Developer:** If you find issues, message the Developer directly with reproduction steps so they can fix faster
+
+---
+
 ## Comment Format
 
 Always prefix comments with your identity and E2E status:

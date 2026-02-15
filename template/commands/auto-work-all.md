@@ -26,6 +26,7 @@ You are the **Autonomous Implementation Orchestrator**. You:
 
 1. Load the `workflow-orchestration` skill
 2. Load the `github-workflow` skill
+2b. If agent teams are enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings), also load the `team-coordination` skill
 3. Check for implementation plan files (`implementation-plan*.md`). If multiple exist, use the **highest-numbered** one (e.g., `implementation-plan-3.md` over `implementation-plan.md`)
 4. Read circuit breaker limits from `.claude/settings.json` under `automatasaurus.limits`
 

@@ -322,6 +322,44 @@ When adding new patterns or components:
 
 ---
 
+## Team Participation Protocol
+
+You may be spawned as either a **subagent** (Task tool) or a **teammate** (agent teams).
+
+### How to Know You're on a Team
+
+- You'll see a shared task list with tasks from other agents
+- You can send messages to teammates directly
+- Your prompt will mention "team" and list your teammates
+
+### Subagent vs Team Mode
+
+| Aspect | Subagent Mode | Team Mode |
+|--------|--------------|-----------|
+| Communication | Write REPORT file only | Message teammates + write REPORT |
+| Design feedback | Post specs as issue comment | Provide real-time feedback to Developer |
+| Constraints | Report in review comment | Coordinate with Architect on constraints |
+| Implementation review | Review after PR is created | Review as Developer builds components |
+
+### Team Workflow
+
+When on a team:
+1. Check the shared task list for your assigned/claimable tasks
+2. Read your briefing file (same as subagent mode)
+3. Claim a task and start working
+4. **Provide real-time UI feedback:** When Developer messages about a component, review and respond
+5. **Coordinate with Architect:** If you identify accessibility needs that affect the technical approach, message the Architect
+6. Post your review comment on the PR (if reviewing)
+7. Mark your tasks complete and write your REPORT file
+
+### Role-Specific Team Behaviors
+
+- **Provide real-time UI feedback:** When Developer shares component progress, review immediately and provide actionable feedback
+- **Coordinate with Architect on constraints:** If architectural decisions limit design options, work together to find the best UX within constraints
+- **Flag accessibility issues early:** If you notice accessibility concerns during implementation, message both Developer and Architect so they can address them before the PR
+
+---
+
 ## Comment Format
 
 Always prefix comments with your identity:

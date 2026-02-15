@@ -285,6 +285,51 @@ orchestration/
 
 This provides a full audit trail of agent communication for each issue.
 
+## Agent Teams (Experimental)
+
+Automatasaurus supports two coordination modes for multi-agent work:
+
+### Subagents (Default)
+
+The standard approach — agents are spawned via the Task tool, read a briefing, do their work, and write a report. Communication flows through the orchestrator only.
+
+### Agent Teams
+
+An experimental alternative — multiple agents run as independent Claude Code sessions that coordinate via shared task lists and peer-to-peer messaging. Agents can communicate directly with each other during work.
+
+### When to Use Each
+
+| Workflow Step | Subagents | Teams | Decision Factor |
+|--------------|-----------|-------|-----------------|
+| Design specs | Always | N/A | Single-agent task |
+| Implementation | Default | When UI work needs real-time designer feedback | `teamPreferForImplementation` |
+| Reviews | Default | When cross-pollination of findings adds value | `teamPreferForReviews` |
+| Feedback fixes | Always | N/A | Single-agent task |
+| Stuck analysis | Always | N/A | Single-agent task |
+
+### Team Composition Patterns
+
+| Pattern | Teammates | Use Case |
+|---------|-----------|----------|
+| Review Team | Architect + Tester + Designer | PR reviews with coordinated findings |
+| Implementation Team | Developer + Designer | UI features with real-time iteration |
+| Discovery Review Team | Architect + Designer | Discovery plan reviews |
+
+### Limitations
+
+- Agent teams are experimental and may not be available in all environments
+- Playwright MCP may not be available in teammate sessions (Tester fallback to subagent)
+- Teams use more tokens than subagents due to concurrent sessions and messaging
+- Always have a fallback to subagents if team creation fails
+
+### Audit Trail
+
+Both modes use the same orchestration folder structure. Teams additionally produce:
+- `REPORT-team-review.md` — synthesized findings from team reviews
+- `REPORT-design-review-inline.md` — inline designer feedback during implementation teams
+
+For detailed patterns, load the `team-coordination` skill.
+
 ## GitHub Integration
 
 This project uses the `gh` CLI for GitHub operations. Ensure you are authenticated:
@@ -304,6 +349,7 @@ Available skills in `.claude/skills/`:
 - `pr-writing` - Best practices for writing clear PR descriptions
 - `code-review` - Best practices for performing thorough code reviews
 - `agent-coordination` - Multi-agent workflow patterns and briefing/report protocol
+- `team-coordination` - Agent teams patterns (experimental) — peer-to-peer coordination
 - `project-commands` - Finding and using project-specific commands
 - `notifications` - User notification system for questions, approvals, and alerts
 
@@ -342,6 +388,7 @@ Notifications are also sent automatically on stop based on context.
 | `GITHUB_WORKFLOW` | Set to "enabled" for GitHub integration |
 | `AUTOMATASAURUS_SOUND` | Set to "false" to disable notification sounds |
 | `AUTOMATASAURUS_LOG` | Custom log file location |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | Set to "1" to enable agent teams (experimental) |
 
 ## Sandbox Configuration
 

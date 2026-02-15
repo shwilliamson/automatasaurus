@@ -62,6 +62,33 @@ When delegating to agents, include mode context:
 
 ---
 
+## Coordination Modes
+
+The orchestrator can use two modes for delegating work to agents:
+
+| Mode | Mechanism | Communication | Best For |
+|------|-----------|---------------|----------|
+| **Subagents** (default) | Task tool spawns agent | Report to orchestrator only via briefing/report files | Independent tasks, linear workflows |
+| **Agent Teams** (experimental) | Team of concurrent sessions | Peer-to-peer messaging + shared task list | Multi-role reviews, real-time collaboration |
+
+### Decision Criteria
+
+| Workflow Step | Default | Team Alternative | When to Use Team |
+|--------------|---------|-----------------|-----------------|
+| Design specs | Subagent | N/A | Always subagent |
+| Implementation | Subagent | Developer + Designer team | UI work needing real-time designer feedback |
+| Reviews | Subagent (parallel) | Review team | Cross-pollination of findings adds value |
+| Feedback fixes | Subagent | N/A | Always subagent |
+
+Settings control defaults:
+- `teamPreferForReviews: true` — default to review teams
+- `teamPreferForImplementation: false` — default to solo developer subagent
+- `teamMaxTeammates: 4` — cap concurrent team members
+
+Teams are experimental. Always fall back to subagents if team creation fails.
+
+---
+
 ## Two-Phase Workflow
 
 ### Phase 1: Discovery (Interactive)
@@ -92,11 +119,14 @@ User: /auto-work-all
     LOOP for each issue:
       - Setup orchestration folder
       - Check dependencies
+      - Choose coordination mode (teams vs subagents per step)
       - Spawn Designer → specs (if UI)
-      - Spawn Developer → implements, creates PR
-      - Spawn Architect → reviews PR
-      - Spawn Designer → reviews PR (if UI)
-      - Spawn Tester → verifies PR
+      - Implementation:
+          Subagent path: Spawn Developer → implements, creates PR
+          Team path:     Developer + Designer team → real-time iteration, PR
+      - Reviews:
+          Subagent path: Spawn Architect, Designer, Tester in parallel
+          Team path:     Review team → coordinated findings
       - Check PR Done Criteria
       - Merge (if all-issues mode)
       - Continue to next

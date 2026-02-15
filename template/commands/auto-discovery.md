@@ -221,7 +221,9 @@ Create the document in the project:
 
 After creating discovery.md, get feedback from specialist agents:
 
-### Architect Review
+### Option A: Subagent Reviews (Default)
+
+#### Architect Review
 ```
 Use the Task tool with:
   subagent_type: "architect"
@@ -233,7 +235,7 @@ Use the Task tool with:
     The discovery plan is at: [path to discovery.md]
 ```
 
-### Designer Review
+#### Designer Review
 ```
 Use the Task tool with:
   subagent_type: "designer"
@@ -244,6 +246,24 @@ Use the Task tool with:
     Focus on: user flows, accessibility, responsive design, missing UI requirements.
     The discovery plan is at: [path to discovery.md]
 ```
+
+### Option B: Discovery Review Team (If agent teams enabled)
+
+If `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set and you want coordinated review feedback, load the `team-coordination` skill and use the Discovery Review Team pattern:
+
+```
+Create a team to review the discovery plan at [path to discovery.md].
+
+Teammates:
+- Architect: Review for technical feasibility, architecture fit, scalability
+- Designer: Review for UI/UX considerations, user flows, accessibility
+
+Each teammate shares findings with the other for cross-review.
+Architect flags technical constraints that affect UI.
+Designer flags UX requirements with architectural implications.
+```
+
+If team creation fails, fall back to Option A (subagent reviews).
 
 Present the feedback to the user. Refine the discovery document based on feedback.
 

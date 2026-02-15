@@ -20,9 +20,10 @@ This skill expects an `ISSUE_NUMBER` to be provided by the caller.
 2. SETUP ORCHESTRATION FOLDER
 3. GET ISSUE DETAILS
 4. CHECK DEPENDENCIES → If blocked, report and stop
+4.5. CHOOSE COORDINATION MODE → Teams vs subagents for each step
 5. GET DESIGN SPECS (if UI) → Invoke designer agent with briefing
-6. IMPLEMENT → Invoke developer agent with briefing
-7. COORDINATE REVIEWS → Architect (required), Designer (if UI), Tester (required)
+6. IMPLEMENT → Invoke developer agent (or team) with briefing
+7. COORDINATE REVIEWS → Architect, Designer (if UI), Tester (subagents or team)
 8. HANDLE CHANGE REQUESTS → Loop until all approved
 9. COMMIT ORCHESTRATION FILES → Preserve audit trail in branch
 10. REPORT RESULT → Success, Blocked, or Escalated
@@ -124,6 +125,46 @@ gh issue view {dep_number} --json state --jq '.state'
 Report: "BLOCKED: Issue #{ISSUE_NUMBER} is blocked on #{dep_number}"
 Stop here.
 ```
+
+---
+
+## Step 4.5: Choose Coordination Mode
+
+Read team preferences from `.claude/settings.json` under `automatasaurus.limits`:
+
+```bash
+# Check team preferences
+cat .claude/settings.json | grep -A3 'teamPrefer'
+```
+
+### Decision Matrix
+
+| Step | Default Mode | Use Team When |
+|------|-------------|---------------|
+| Design Specs (Step 5) | Subagent | N/A — single agent task |
+| Implementation (Step 6) | Subagent | `teamPreferForImplementation: true` AND issue has UI work |
+| Reviews (Step 7) | Subagent | `teamPreferForReviews: true` |
+| Address Feedback (Step 8) | Subagent | N/A — single agent task |
+
+### Set Mode for Each Step
+
+Based on settings and issue context:
+
+```
+implementationMode = "subagent"  # default
+reviewMode = "subagent"          # default
+
+# Check settings
+if teamPreferForImplementation AND issue has UI work:
+    implementationMode = "team"
+
+if teamPreferForReviews:
+    reviewMode = "team"
+```
+
+If teams are enabled for any step, load the `team-coordination` skill for detailed patterns.
+
+**Important:** Teams are experimental. If team creation fails at any step, fall back to subagent mode and continue the workflow.
 
 ---
 
@@ -243,6 +284,34 @@ Get PR number from report or:
 ```bash
 gh pr list --search "head:{ISSUE_NUMBER}-" --json number --jq '.[0].number'
 ```
+
+### 6b-alt. Spawn Implementation Team (If implementationMode = "team")
+
+When the issue involves UI work and `teamPreferForImplementation` is true, use an implementation team instead of a solo developer subagent.
+
+```
+1. Write BRIEFING-implement.md (same content as 6a above)
+2. Write BRIEFING-design-specs.md if not already written in Step 5
+
+3. Create team:
+   "Create a team to implement issue #{ISSUE_NUMBER}: {title}.
+
+   Teammates:
+   - Developer: Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-implement.md.
+     Implement the feature, write tests, create PR with 'Closes #{ISSUE_NUMBER}'.
+     Message Designer when starting UI components or making design decisions.
+     Write report to orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-implement.md.
+
+   - Designer: Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-design-specs.md.
+     Provide real-time feedback on UI implementation.
+     Message Developer if implementation doesn't match specs.
+     Write report to orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-design-review-inline.md."
+
+4. After team completes, read REPORT-implement.md
+5. Get PR number (same as 6c)
+```
+
+**Fallback:** If team creation fails, fall back to standard Step 6b (solo developer subagent).
 
 ---
 
@@ -372,6 +441,47 @@ Use the Task tool with:
     After completing verification, write your report to:
     orchestration/issues/{ISSUE_NUMBER}-{slug}/REPORT-test.md
 ```
+
+### 7b-alt. Spawn Review Team (If reviewMode = "team")
+
+When `teamPreferForReviews` is true, use a review team instead of parallel subagents. This enables reviewers to share findings in real-time.
+
+```
+1. Write all BRIEFING files (same as 7a above)
+
+2. Create team:
+   "Create a team to review PR #{pr_number} for issue #{ISSUE_NUMBER}: {title}.
+
+   Teammates:
+   - Architect: Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-architect-review.md.
+     Review PR for technical quality and architecture alignment.
+     If you find concerns the Tester should verify, message them.
+     Post review comment and write report to REPORT-architect-review.md.
+
+   - Tester: Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-test.md.
+     Verify PR meets acceptance criteria using Playwright MCP for E2E testing.
+     Check any concerns flagged by Architect.
+     Post review comment and write report to REPORT-test.md.
+
+   - Designer: Read orchestration/issues/{ISSUE_NUMBER}-{slug}/BRIEFING-designer-review.md.
+     Review UI/UX quality and accessibility.
+     If you find accessibility issues, flag to Architect for technical assessment.
+     Post review comment and write report to REPORT-designer-review.md.
+     (Only include Designer if PR has UI changes.)
+
+   Each teammate must post a standardized review comment:
+   - ✅ APPROVED - {Role}
+   - ❌ CHANGES REQUESTED - {Role}
+
+   All teammates must complete their reviews."
+
+3. After team completes, read all REPORT files
+4. Write REPORT-team-review.md synthesizing findings
+```
+
+**Fallback:** If team creation fails, fall back to standard Step 7b (parallel subagents). The BRIEFING files are already written, so subagent invocation can proceed immediately.
+
+**Note on Tester MCP access:** Playwright MCP may not be available in teammate sessions. If the Tester teammate cannot perform E2E testing, they should message the team lead and the orchestrator should fall back to spawning Tester as a subagent (which has MCP configured).
 
 ### 7c. Read All Review Reports
 
@@ -541,21 +651,23 @@ After working on issue #42, the folder should contain:
 
 ```
 orchestration/issues/42-user-auth/
-├── BRIEFING-design-specs.md      # (if UI) What designer was asked to do
-├── REPORT-design-specs.md        # (if UI) What designer did
-├── BRIEFING-implement.md         # What developer was asked to do
-├── REPORT-implement.md           # What developer did
-├── BRIEFING-architect-review.md  # What architect was asked to review
-├── REPORT-architect-review.md    # Architect's review findings
-├── BRIEFING-designer-review.md   # (if UI) What designer was asked to review
-├── REPORT-designer-review.md     # (if UI) Designer's review findings
-├── BRIEFING-test.md              # What tester was asked to verify
-├── REPORT-test.md                # Tester's verification results
-├── BRIEFING-address-feedback.md  # (if changes requested) Feedback to address
-└── REPORT-address-feedback.md    # (if changes requested) How feedback was addressed
+├── BRIEFING-design-specs.md          # (if UI) What designer was asked to do
+├── REPORT-design-specs.md            # (if UI) What designer did
+├── BRIEFING-implement.md             # What developer was asked to do
+├── REPORT-implement.md               # What developer did
+├── REPORT-design-review-inline.md    # (if implementation team) Designer's inline feedback
+├── BRIEFING-architect-review.md      # What architect was asked to review
+├── REPORT-architect-review.md        # Architect's review findings
+├── BRIEFING-designer-review.md       # (if UI) What designer was asked to review
+├── REPORT-designer-review.md         # (if UI) Designer's review findings
+├── BRIEFING-test.md                  # What tester was asked to verify
+├── REPORT-test.md                    # Tester's verification results
+├── REPORT-team-review.md             # (if review team) Synthesized team findings
+├── BRIEFING-address-feedback.md      # (if changes requested) Feedback to address
+└── REPORT-address-feedback.md        # (if changes requested) How feedback was addressed
 ```
 
-This provides a complete audit trail of all agent communication for the issue.
+This provides a complete audit trail of all agent communication for the issue, whether using subagents or teams.
 
 ---
 

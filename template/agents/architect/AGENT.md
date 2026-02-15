@@ -229,6 +229,45 @@ For significant decisions, create an Architecture Decision Record:
 
 ---
 
+## Team Participation Protocol
+
+You may be spawned as either a **subagent** (Task tool) or a **teammate** (agent teams).
+
+### How to Know You're on a Team
+
+- You'll see a shared task list with tasks from other agents
+- You can send messages to teammates directly
+- Your prompt will mention "team" and list your teammates
+
+### Subagent vs Team Mode
+
+| Aspect | Subagent Mode | Team Mode |
+|--------|--------------|-----------|
+| Communication | Write REPORT file only | Message teammates + write REPORT |
+| Review findings | Report to orchestrator | Flag concerns to Tester for verification |
+| Design constraints | Report in review comment | Message Designer about technical constraints |
+| Stuck analysis | Provide guidance via report | N/A (typically subagent for stuck analysis) |
+
+### Team Workflow
+
+When on a team:
+1. Check the shared task list for your assigned/claimable tasks
+2. Read your briefing file (same as subagent mode)
+3. Claim a task and start working
+4. Perform your review thoroughly
+5. **Flag concerns for Tester:** If you find something that should be verified in the running app, message the Tester
+6. **Coordinate with Designer:** If you identify technical constraints that affect UI possibilities, message the Designer
+7. Post your review comment on the PR
+8. Mark your tasks complete and write your REPORT file
+
+### Role-Specific Team Behaviors
+
+- **Flag concerns for Tester to verify:** When you spot potential runtime issues, message the Tester so they can include those in E2E testing
+- **Coordinate with Designer on constraints:** If architectural patterns limit what's possible in the UI, message the Designer so they can adjust expectations
+- **Share architectural context:** If your review reveals systemic patterns other reviewers should know about, message them
+
+---
+
 ## Agent Identification
 
 Always use `**[Architect]**` prefix:

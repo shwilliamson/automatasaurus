@@ -7,6 +7,23 @@ description: Patterns for invoking and coordinating Automatasaurus agents. Use w
 
 This skill provides patterns for invoking the Automatasaurus agents and managing bidirectional context flow.
 
+## Coordination Modes
+
+Automatasaurus supports two modes for coordinating agent work:
+
+| Mode | Mechanism | Communication | Best For |
+|------|-----------|---------------|----------|
+| **Subagents** (default) | Task tool | Report to orchestrator only | Single-role tasks, linear workflows |
+| **Agent Teams** (experimental) | Team creation | Peer-to-peer messaging + shared tasks | Multi-role reviews, real-time collaboration |
+
+**Decision criteria:**
+- Use **subagents** when tasks are independent and don't benefit from real-time coordination
+- Use **teams** when agents should share findings and coordinate in real-time (e.g., review cycles)
+- Check `teamPreferForReviews` and `teamPreferForImplementation` in settings for project defaults
+- Always have a **fallback to subagents** — teams are experimental
+
+For detailed team patterns, load the `team-coordination` skill.
+
 ## Available Agents
 
 | Agent | Purpose | When to Use |
@@ -456,17 +473,79 @@ Read REPORT-test.md
 
 ---
 
+## Team Invocation Patterns
+
+When using agent teams instead of subagents, the orchestrator creates a team and acts as lead in delegate mode.
+
+### Review Team (Alternative to Parallel Subagent Reviews)
+
+Instead of spawning architect, designer, and tester as separate subagents:
+
+```
+1. Write all BRIEFING files (same as subagent approach)
+
+2. Create team:
+   "Create a team to review PR #{pr_number} for issue #{issue_number}.
+
+   Teammates:
+   - Architect: Read BRIEFING-architect-review.md, review PR for technical quality
+   - Tester: Read BRIEFING-test.md, verify PR with E2E testing
+   - Designer: Read BRIEFING-designer-review.md, review UI/UX (if applicable)
+
+   Each teammate: read briefing, perform review, post comment, write report."
+
+3. After team completes, read all REPORT files
+4. Write REPORT-team-review.md synthesizing findings
+```
+
+### Implementation Team (Alternative to Sequential Designer → Developer)
+
+Instead of spawning designer first, then developer:
+
+```
+1. Write BRIEFING files for both roles
+
+2. Create team:
+   "Create a team to implement issue #{issue_number}.
+
+   Teammates:
+   - Developer: Read BRIEFING-implement.md, implement feature, create PR
+   - Designer: Read BRIEFING-design-specs.md, provide real-time UI feedback
+
+   Developer messages Designer for UI decisions.
+   Designer messages Developer when implementation doesn't match specs."
+
+3. After team completes, read REPORT files
+```
+
+### Team Briefing Format
+
+Team briefings use the same format as subagent briefings (see templates above), with an added "Team Context" section:
+
+```markdown
+## Team Context
+You are part of a team. Your teammates are:
+- {Role}: {their task}
+Message teammates when you find something relevant to their review.
+```
+
+### Fallback
+
+If team creation fails, fall back to standard subagent invocation. See `team-coordination` skill for the full fallback protocol.
+
+---
+
 ## Quality Gates
 
 Each agent has quality gates:
 
-| Agent | Gate |
-|-------|------|
-| Developer | Tests passing, PR created |
-| Architect | Technical review complete |
-| Designer | Design review complete |
-| Researcher | Structured report written with findings and sources |
-| Tester | All tests pass, verification complete |
+| Agent | Gate (Subagent) | Gate (Team) |
+|-------|------|------|
+| Developer | Tests passing, PR created | Same + shared UI progress with designer |
+| Architect | Technical review complete | Same + cross-findings shared with teammates |
+| Designer | Design review complete | Same + real-time feedback provided |
+| Researcher | Structured report written with findings and sources | N/A (typically subagent only) |
+| Tester | All tests pass, verification complete | Same + verified architect-flagged concerns |
 
 ---
 

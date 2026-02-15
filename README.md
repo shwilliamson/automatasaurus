@@ -2,7 +2,7 @@
 
 <img src="logo.jpeg" alt="Automatasaurus Logo" width="200">
 
-An automated software development workflow powered by Claude Code. Uses specialized subagents, stop hooks, and skills to enable extended autonomous development sessions with multiple coordinated agents.
+An automated software development workflow powered by Claude Code. Uses specialized subagents, agent teams, stop hooks, and skills to enable extended autonomous development sessions with multiple coordinated agents.
 
 ## Quick Start
 
@@ -99,10 +99,11 @@ User: /auto-work-all
 │    - Open PR with "Closes #X"                                      │
 │    - Writes REPORT-implement.md                                    │
 │                                                                     │
-│ 5. Review Cycle (parallel)                                          │
+│ 5. Review Cycle (parallel subagents OR review team)                  │
 │    ├→ Architect: REQUIRED review (reads/writes briefing/report)    │
 │    ├→ Designer: Review if UI-relevant                              │
-│    └→ Developer: Address feedback, push fixes                      │
+│    ├→ Developer: Address feedback, push fixes                      │
+│    └→ (Team mode: reviewers coordinate findings in real-time)      │
 │                                                                     │
 │ 6. Tester: Verification                                             │
 │    - Reads BRIEFING-test.md (includes all prior reports)           │
@@ -145,6 +146,7 @@ All agents prefix their comments with their identity:
 ## Features
 
 - **Bidirectional Context Flow**: Agents communicate through briefings and reports, creating an audit trail
+- **Agent Teams (Experimental)**: Multiple agents coordinate via shared task lists and peer-to-peer messaging for real-time collaboration
 - **Stop Hooks**: Intelligent evaluation ensures tasks are complete before stopping
 - **Subagent Coordination**: Specialized agents with role-specific completion criteria
 - **GitHub Integration**: All work coordinated through issues, PRs, and labels
@@ -559,6 +561,39 @@ Default values in `.claude/settings.json`:
 
 **Note:** Don't edit `settings.json` directly—your changes will be overwritten on update. Use `settings.local.json` for all customizations.
 
+### Agent Teams (Experimental)
+
+Agent teams allow multiple agents to coordinate via shared task lists and direct messaging instead of the default subagent approach. This is most valuable for review cycles where cross-pollination of findings matters.
+
+Teams are enabled by default via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings. Control team behavior in `.claude/settings.local.json`:
+
+```json
+{
+  "automatasaurus": {
+    "limits": {
+      "teamMaxTeammates": 4,
+      "teamPreferForReviews": true,
+      "teamPreferForImplementation": false
+    }
+  }
+}
+```
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `teamMaxTeammates` | 4 | Maximum concurrent teammates (cost control) |
+| `teamPreferForReviews` | true | Use review teams instead of parallel subagents |
+| `teamPreferForImplementation` | false | Use implementation teams for UI issues |
+
+To disable agent teams entirely, set in `settings.local.json`:
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"
+  }
+}
+```
+
 ### Notifications
 
 Configure notification behavior via environment variables:
@@ -617,6 +652,7 @@ The developer agent loads language-specific skills on demand:
 ## Roadmap
 
 - [x] CLI tool for easy installation (`automatasaurus init`)
+- [x] Agent teams support (experimental) — peer-to-peer agent coordination
 - [ ] Project detection and automatic command configuration
 - [ ] Additional MCP integrations (database, API testing)
 - [ ] Custom agent templates
@@ -647,6 +683,7 @@ This opens a browser for authentication (works with passkeys/security keys).
 - [Subagents Reference](https://code.claude.com/docs/en/sub-agents)
 - [Hooks Reference](https://code.claude.com/docs/en/hooks)
 - [Skills Reference](https://code.claude.com/docs/en/skills)
+- [Agent Teams (Experimental)](https://code.claude.com/docs/en/agent-teams)
 - [Playwright MCP](https://github.com/microsoft/playwright-mcp)
 - [GitHub CLI](https://cli.github.com/)
 - [Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)

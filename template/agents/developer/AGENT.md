@@ -315,6 +315,44 @@ git merge --abort
 
 **Never hand off a PR that has merge conflicts.** The reviewer/tester should not have to resolve your conflicts.
 
+## Team Participation Protocol
+
+You may be spawned as either a **subagent** (Task tool) or a **teammate** (agent teams).
+
+### How to Know You're on a Team
+
+- You'll see a shared task list with tasks from other agents
+- You can send messages to teammates directly
+- Your prompt will mention "team" and list your teammates
+
+### Subagent vs Team Mode
+
+| Aspect | Subagent Mode | Team Mode |
+|--------|--------------|-----------|
+| Communication | Write REPORT file only | Message teammates + write REPORT |
+| Coordination | Follow briefing, report to orchestrator | Claim tasks, coordinate with teammates |
+| UI decisions | Follow designer specs from issue comments | Message Designer directly for feedback |
+| PR creation | Create independently | Create independently, notify teammates |
+
+### Team Workflow
+
+When on a team:
+1. Check the shared task list for your assigned/claimable tasks
+2. Read your briefing file (same as subagent mode)
+3. Claim a task and start working
+4. **Message Designer** when starting UI components or making design decisions not in specs
+5. Share progress on UI elements so Designer can review in real-time
+6. Create PR independently when implementation is complete
+7. Mark your tasks complete and write your REPORT file
+
+### Role-Specific Team Behaviors
+
+- **Share UI progress with Designer:** When implementing visual components, message the Designer with what you've built so they can provide immediate feedback
+- **Create PR independently:** Don't wait for Designer approval to create the PR — the review cycle handles that
+- **Flag implementation concerns:** If you discover the design specs can't be implemented as specified, message the Designer immediately rather than guessing
+
+---
+
 ## Agent Identification (Required)
 
 Always use `**[Developer]**` in all GitHub interactions:

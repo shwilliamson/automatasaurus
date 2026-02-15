@@ -1,6 +1,6 @@
 # Automatasaurus Framework Files
 
-This folder contains the Automatasaurus framework - an automated software development workflow powered by Claude Code.
+This folder contains the Automatasaurus framework - an automated software development workflow powered by Claude Code. Agents coordinate via subagents or experimental agent teams for real-time collaboration.
 
 **Do not edit files in this folder directly.** They are managed by the installer and will be overwritten on updates.
 
@@ -9,7 +9,7 @@ This folder contains the Automatasaurus framework - an automated software develo
 | Folder | Purpose |
 |--------|---------|
 | `agents/` | Specialized AI personas (Developer, Architect, Tester, etc.) |
-| `skills/` | Knowledge modules (coding standards, workflows, etc.) |
+| `skills/` | Knowledge modules (coding standards, workflows, team coordination, etc.) |
 | `hooks/` | Shell scripts for notifications and workflow control |
 | `commands/` | Slash commands (`/auto-discovery`, `/auto-work-issue`, `/auto-work-all`, `/auto-work-milestone`) |
 

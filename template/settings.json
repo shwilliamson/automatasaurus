@@ -5,7 +5,10 @@
       "maxIssuesPerRun": 20,
       "maxEscalationsBeforeStop": 3,
       "maxRetriesPerIssue": 5,
-      "maxConsecutiveFailures": 3
+      "maxConsecutiveFailures": 3,
+      "teamMaxTeammates": 4,
+      "teamPreferForReviews": true,
+      "teamPreferForImplementation": false
     }
   },
   "permissions": {
@@ -128,6 +131,28 @@
         ]
       }
     ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A teammate agent is idle. Evaluate whether it should claim more work or stop.\n\nContext: $ARGUMENTS\n\n## Check Shared Task List\n1. Are there unclaimed tasks in the shared task list?\n2. Are any tasks blocked that this teammate could help unblock?\n3. Has the team's overall goal been achieved?\n\n## Evaluate Teammate Role\n4. Is there remaining work matching this teammate's specialty?\n5. Would picking up more work help or slow down the team?\n6. Are other teammates waiting on this teammate's input?\n\n## Decision Criteria\n- If unclaimed tasks exist matching this role → claim next task\n- If team goal is achieved → teammate can stop\n- If blocked waiting on others → check if can help unblock\n- If no useful work remains → teammate should stop\n\nRespond with JSON:\n- decision: 'approve' (allow idle/stop) or 'block' (claim more work)\n- reason: explanation\n- systemMessage: what to do next (e.g., 'Claim task X' or 'Team work complete')\n- suppressOutput: true",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A task has been marked completed. Evaluate the completion quality and check for unblocked dependencies.\n\nContext: $ARGUMENTS\n\n## Quality Check\n1. Does the completed task meet its acceptance criteria?\n2. Was the work documented (report written, PR updated, etc.)?\n3. Are there any loose ends or TODO items?\n\n## Dependency Check\n4. Does completing this task unblock other tasks in the shared list?\n5. Should blocked teammates be notified?\n6. Are there follow-up tasks that should be created?\n\n## Team Coordination\n7. Should the lead be notified of completion?\n8. Does this change the team's priority order?\n\nRespond with JSON:\n- decision: 'approve' (completion accepted) or 'block' (more work needed on this task)\n- reason: explanation\n- systemMessage: context for next action\n- suppressOutput: true",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "permission_prompt",
@@ -145,6 +170,7 @@
     "GITHUB_WORKFLOW": "enabled",
     "AUTOMATASAURUS_SOUND": "true",
     "AUTOMATASAURUS_LOG": "/tmp/automatasaurus.log",
-    "MAX_RETRY_ATTEMPTS": "5"
+    "MAX_RETRY_ATTEMPTS": "5",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

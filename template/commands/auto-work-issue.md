@@ -21,6 +21,8 @@ Load and follow the `work-issue` skill with ISSUE_NUMBER = $ARGUMENTS.
 
 Load the `work-issue` skill which contains the full implementation workflow.
 
+If agent teams are enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings), also load the `team-coordination` skill for team patterns.
+
 ### 2. Execute the Workflow
 
 Follow the work-issue skill steps:
