@@ -14,6 +14,7 @@ This skill provides patterns for invoking the Automatasaurus agents and managing
 | `developer` | Implements issues, creates PRs | When code needs to be written |
 | `architect` | Technical reviews, analysis | For PR reviews, discovery reviews, stuck issues |
 | `designer` | UI/UX reviews, design specs | For PR reviews, discovery reviews, design specs |
+| `researcher` | Deep research, technology evaluation | When any agent needs thorough research on a topic |
 | `tester` | Testing, verification | For PR verification, running tests |
 
 ---
@@ -396,6 +397,40 @@ Agent: {role}
 2. Use Task tool with Architect agent, including briefing path.
 ```
 
+### Researcher - Investigate a Topic
+
+```
+1. Write BRIEFING-research.md:
+   # Agent Briefing: research
+   Generated: {timestamp}
+
+   ## Your Task
+   Research {topic} for issue #{number}.
+
+   ## Context
+   - Why this research is needed: {explanation}
+   - What's already known: {existing knowledge}
+
+   ## Research Questions
+   1. {Specific question to answer}
+   2. {Specific question to answer}
+
+   ## Resources (Read as Needed)
+   - Issue #{number}: gh issue view {number}
+   - Relevant code: {paths if known}
+
+   ## Expected Output
+   Structured research report with findings, confidence levels, and sources.
+
+2. Use Task tool with:
+   subagent_type: "researcher"
+   prompt: |
+     Read orchestration/issues/{number}-{slug}/BRIEFING-research.md first.
+
+     After completing your research, write your report to:
+     orchestration/issues/{number}-{slug}/REPORT-research.md
+```
+
 ---
 
 ## Parallel Invocation
@@ -430,6 +465,7 @@ Each agent has quality gates:
 | Developer | Tests passing, PR created |
 | Architect | Technical review complete |
 | Designer | Design review complete |
+| Researcher | Structured report written with findings and sources |
 | Tester | All tests pass, verification complete |
 
 ---

@@ -51,6 +51,7 @@ The following agents are available in `.claude/agents/`:
 | `evolver` | PROJECT.md generation, context synthesis | Opus | N/A |
 | `designer` | UI/UX specs, accessibility, design review | Opus | If UI changes |
 | `developer` | Implementation, PRs, addressing feedback | Opus | N/A |
+| `researcher` | Deep research, technology evaluation, codebase analysis | Sonnet | N/A |
 | `tester` | QA, Playwright, verification | Opus | **Required** |
 
 **Note:** Commands handle orchestration. Agents are autonomous workers invoked by commands.
@@ -75,6 +76,7 @@ Every GitHub comment, issue body, and PR description must start with:
 | Designer | `**[Designer]**` |
 | Developer | `**[Developer]**` |
 | Tester | `**[Tester]**` |
+| Researcher | `**[Researcher]**` |
 | Product Owner | `**[Product Owner]**` |
 
 ### Where to Use

@@ -123,6 +123,7 @@ User: /auto-work-all
 | **Evolver** | Sonnet | Preparation | Synthesizes discovery/planning into agent-specific PROJECT.md files |
 | **Developer** | Sonnet | Implementation | Feature development, bug fixes, PRs, addresses feedback |
 | **Designer** | Sonnet | Experience | UI/UX specs, accessibility, design reviews (if UI changes) |
+| **Researcher** | Sonnet | Research | Deep codebase analysis, technology evaluation, structured reports |
 | **Tester** | Sonnet | Quality | Test execution, Playwright verification, required PR reviews |
 
 **Note:** Commands (`/auto-discovery`, `/auto-work-issue`, `/auto-work-all`) handle orchestration. There is no separate PM agent.
@@ -137,6 +138,7 @@ All agents prefix their comments with their identity:
 **[Developer]** Fixed in commit abc1234. Ready for re-review.
 **[Architect]** ✅ APPROVED - Architect. Clean separation of concerns.
 **[Designer]** N/A - No UI changes in this PR.
+**[Researcher]** Research complete. Report written with findings and sources.
 **[Tester]** ✅ APPROVED - Tester. All tests passing.
 ```
 
@@ -229,6 +231,7 @@ your-project/
 │   │   ├── evolver/             # Agent context generation
 │   │   ├── developer/           # Implementation & PRs
 │   │   ├── designer/            # UI/UX design specs
+│   │   ├── researcher/          # Deep research and investigation
 │   │   └── tester/              # QA, Playwright, merge authority
 │   ├── skills/                  # Knowledge modules
 │   │   ├── workflow-orchestration/
@@ -388,6 +391,7 @@ After planning, run this command to prepare each agent with project-specific gui
 - Developer gets implementation guidance, architecture patterns, tech decisions
 - Architect gets review context, NFRs, integration dependencies
 - Designer gets user personas, flows, accessibility requirements
+- Researcher gets project domain, technology stack, and common research context
 - Tester gets acceptance criteria, edge cases, test coverage needs
 
 The generated context helps agents make better decisions aligned with your project.
@@ -449,6 +453,7 @@ You can also invoke agents directly:
 ```
 Use the architect agent to review the database schema
 Use the tester agent to create a test plan for the API
+Use the researcher agent to evaluate authentication libraries
 Use the tester agent with playwright to verify the checkout flow
 ```
 

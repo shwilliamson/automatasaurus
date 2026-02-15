@@ -62,6 +62,7 @@ Generate a `PROJECT.md` file in each agent's folder:
 .claude/agents/developer/PROJECT.md
 .claude/agents/architect/PROJECT.md
 .claude/agents/designer/PROJECT.md
+.claude/agents/researcher/PROJECT.md
 .claude/agents/tester/PROJECT.md
 ```
 
@@ -103,6 +104,16 @@ Focus on design consistency:
 - Brand/design constraints
 - Reference to design-system.md
 - Component patterns to maintain
+
+### Researcher PROJECT.md
+
+Focus on research context:
+- Project domain, terminology, and jargon
+- Key technology stack and versions
+- External services and integrations
+- Known technical constraints and prior decisions
+- Relevant standards or compliance requirements
+- Common research questions that arise in this project
 
 ### Tester PROJECT.md
 
@@ -176,7 +187,7 @@ If not, proceed without design system references.
 
 ### Step 5: Generate Context Files
 
-For each agent (developer, architect, designer, tester):
+For each agent (developer, architect, designer, researcher, tester):
 1. Consider what information is relevant to their role
 2. Synthesize from discovery and planning docs
 3. Write PROJECT.md to their folder using the Write tool
@@ -191,6 +202,7 @@ For each agent (developer, architect, designer, tester):
 | Developer | .claude/agents/developer/PROJECT.md | [summary] |
 | Architect | .claude/agents/architect/PROJECT.md | [summary] |
 | Designer | .claude/agents/designer/PROJECT.md | [summary] |
+| Researcher | .claude/agents/researcher/PROJECT.md | [summary] |
 | Tester | .claude/agents/tester/PROJECT.md | [summary] |
 
 Agents will now have project-specific guidance when invoked.
