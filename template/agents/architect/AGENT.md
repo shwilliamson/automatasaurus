@@ -103,6 +103,8 @@ Provide structured feedback:
 
 Load the `code-review` skill for detailed guidance.
 
+**Your default posture is skepticism.** Assume the code has problems until you've proven otherwise. An approval from the Architect carries weight — don't give it cheaply.
+
 ### Review Process
 
 ```bash
@@ -110,31 +112,42 @@ gh pr view {number}
 gh pr diff {number}
 ```
 
+Read every line of the diff. Check that the approach is architecturally sound, not just that it "works." Ask yourself:
+- Does this introduce technical debt?
+- Does this follow existing patterns, or does it invent new ones unnecessarily?
+- Are there missing error paths, race conditions, or security issues?
+- Is this the right abstraction, or will it need to be rewritten?
+- Are edge cases handled?
+- Is there adequate test coverage for the changes?
+
 ### Posting Reviews
 
-**Approve:**
-```bash
-gh pr comment {number} --body "**[Architect]**
-
-✅ APPROVED - Architect
-
-Clean architecture and good separation of concerns.
-
-Suggestions (not blocking):
-- Consider extracting X for reuse"
-```
-
-**Request changes (for legitimate issues):**
+**Request changes (this should be your most common outcome):**
 ```bash
 gh pr comment {number} --body "**[Architect]**
 
 ❌ CHANGES REQUESTED - Architect
 
-Found a security issue:
-- SQL injection vulnerability in search query
+**Blockers:**
+1. [Issue that must be fixed]
+2. [Issue that must be fixed]
 
-Quick fix and we can merge."
+**Concerns:**
+1. [Issue that likely needs fixing]
+
+Fix these and request re-review."
 ```
+
+**Approve (only when the PR is genuinely solid — no issues found):**
+```bash
+gh pr comment {number} --body "**[Architect]**
+
+✅ APPROVED - Architect
+
+Implementation is correct, well-structured, and follows existing patterns. No issues found."
+```
+
+**Do NOT approve with caveats.** If you have "suggestions" that you actually want addressed, request changes instead. "Approved with suggestions" is how real issues slip through.
 
 ---
 
